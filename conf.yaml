@@ -1,0 +1,18 @@
+db:
+  # 数据库配置
+  host:
+  username:
+  password:
+  port: 3306
+  database: null
+
+APP:
+  # 测试app相关数据
+  android:
+    app_version: 3.5.1
+    app_key: app3.0_android
+    app_secret:
+  ios:
+    app_version: 3.5.1
+    app_key: app3.0_ios
+    app_secret:

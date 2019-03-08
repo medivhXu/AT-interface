@@ -1,0 +1,26 @@
+case:
+  1:
+    name: "发送短信"
+    request:
+      checkpoint:
+        text:
+          code: 200
+      data:
+        phone: $phone
+        token: $token_data
+      path: /services/v3/begin/sendMsg
+    response:
+  2:
+    name: "登录"
+    request:
+      path: /services/v3/begin/loginAppV42
+      data:
+        phone: $phone
+        code: $$get_db_msg($phone)
+        token:
+    response:
+      text:
+        token: $token
+
+host:
+  port: null
