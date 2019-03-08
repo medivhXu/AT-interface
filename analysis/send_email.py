@@ -5,17 +5,17 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
-from .conf_manager import ConfYaml
+from base.conf_manager import ConfYaml
 from base.log import logged, LOGGER
 
 
 class SendEmail(object):
     def __init__(self, em_from="Python3", to="Me", subject="**** 接口自动化测试报告 ****"):
-        conf = ConfYaml()
-        self._mail_host = conf("EMAIL", "mail_host")
-        self._rec_user = conf.read("EMAIL", "rec_user")
-        self._mail_pass = conf.read("EMAIL", "mail_pass")
-        self._sender = conf.read("EMAIL", "sender")
+        conf = ConfYaml('__conf.yaml')
+        self._mail_host = conf.read()
+        self._rec_user = conf.read()['EMAIL']['receiver']
+        self._mail_pass = conf.read()['EMAIL']['mail_pass']
+        self._sender = conf.read()['EMAIL']['sender']
         self._message = MIMEMultipart()
         self._message['From'] = formataddr([em_from, self._sender])
         self._message['To'] = formataddr([to, self._rec_user])

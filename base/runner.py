@@ -4,7 +4,7 @@ import datetime
 import os
 from base import HTMLTestReportCN
 import unittest
-from .send_email import SendEmail
+from analysis.send_email import SendEmail
 
 
 class TestRunner(object):

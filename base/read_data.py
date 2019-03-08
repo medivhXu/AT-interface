@@ -2,11 +2,13 @@
 # coding=utf-8
 import datetime
 import os
+
 try:
     from openpyxl import load_workbook
 except ImportError:
     os.system("pip3 install openpyxl")
     from openpyxl import load_workbook
+
 from base.log import logged
 
 

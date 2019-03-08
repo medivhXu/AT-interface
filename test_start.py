@@ -4,11 +4,10 @@ import unittest
 import requests
 from parameterized import parameterized
 from base.collage_string import CollageStr
-from base.comparison_results import diff_str
-from base.conf_manager import ConfYaml
+from base.loadcase import LoadCase
 from base.runner import TestRunner
 from base.my_exception import *
-from base.log import LOGGER, logged
+from base.log import LOGGER
 
 
 class SendMsg(unittest.TestCase, TestRunner):
@@ -20,17 +19,14 @@ class SendMsg(unittest.TestCase, TestRunner):
     def tearDownClass(cls):
         pass
 
-    cases = ConfYaml('interface.yaml').read()
+    cases = LoadCase().get_all_data_list()
 
     # debug data
-    par = [(1, 'https://test-acs.czb365.com', 'post', None, '/services/v3/begin/sendMsg', {'text': {'code': 200}},
+    par = [(1, '短信', 'https://test-acs.czb365.com', 'post', None, '/services/v3/begin/sendMsg', {'text': {'code': 200}},
             {'text': {'code': 200}})]
 
-    tes = {{1: {'request': {'https://test-acs.czb365.com', 'post', None, '/services/v3/begin/sendMsg', {'text': {'code': 200}},
-            {'text': {'code': 200}}}}}}
-
-    @parameterized.expand(par)
-    def test_run(self, case_no, url, method, header, path, data, expected, result):
+    @parameterized.expand(cases)
+    def test_run(self, case_no, case_name, url, method, port, data, checkpoint):
         sign_str = CollageStr(data).sign_str()
         full_data = data.updata({'sign': sign_str})
         if method == 'get':
@@ -49,8 +45,6 @@ class SendMsg(unittest.TestCase, TestRunner):
                 LOGGER.info("[+]用例: {}, 请求地址: {}, 参数: {} , 响应: {}".format(case_no, url, data, res.text))
         else:
             raise MethodException("方法错误，不支持{}方法!".format(method))
-
-        self.assertEqual(res.items(), expected, "不相等～")
 
 
 if __name__ == '__main__':

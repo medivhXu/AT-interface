@@ -22,7 +22,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['requests', 'pymysql', 'pyyaml', 'parameterized', 'pyDes', 'ruamel.yaml'],
+    install_requires=['requests', 'pymysql', 'openpyxl', 'pyyaml', 'parameterized', 'pyDes', 'ruamel.yaml'],
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: POSIX :: Linux',
