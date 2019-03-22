@@ -26,3 +26,7 @@ class MethodException(MyException):
 
 class ConfigurationException(MyException):
     pass
+
+
+class UpdateConfException(MyException):
+    pass

@@ -5,7 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
-from base.conf_manager import ConfYaml
+from configElement.yaml_data import ConfYaml
 from base.log import logged, LOGGER
 
 
@@ -22,17 +22,17 @@ class SendEmail(object):
         self._message['Subject'] = subject
 
     @logged
-    def send_text_to_email(self, msg):
+    def send_text_to_email(self, msg: str) -> bool:
         """
         发送纯文本格式邮件
         warning: 这个方法不能与发送html方法共用，如果共用以先执行的方法发送，后执行的方法无效
         :param msg:  type(str)
         """
         self._message.attach(MIMEText(msg, 'plain'))
-        self._send_email()
+        return self._send_email()
 
     @logged
-    def send_html_to_email(self, fp):
+    def send_html_to_email(self, fp) -> bool:
         """
         发送html格式邮件
         :param fp: 要发送文件的绝对路径或相对路径
@@ -41,10 +41,10 @@ class SendEmail(object):
         with open(fp, 'r', encoding='utf-8') as f:
             page_source = f.read()
             self._message.attach(MIMEText(page_source, 'html'))
-        self._send_email()
+        return self._send_email()
 
     @logged
-    def send_file_to_email(self, fp):
+    def send_file_to_email(self, fp) -> bool:
         """
         发送附件格式邮件
         :param fp: 要发送文件的绝对路径或相对路径
@@ -54,7 +54,7 @@ class SendEmail(object):
         att["Content-Type"] = 'application/octet-stream'
         att["Content-Disposition"] = 'attachment; filename="logs.txt'
         self._message.attach(att)
-        self._send_email()
+        return self._send_email()
 
     @logged
     def _send_email(self):
@@ -67,6 +67,7 @@ class SendEmail(object):
         except smtplib.SMTPException as e:
             LOGGER.error("Error: 无法发送邮件, {}".format(e))
             raise e
+        return True
 
 
 if __name__ == '__main__':

@@ -16,9 +16,10 @@ except ImportError as e:
 
 class Encryption(object):
     """对参数进行md5加密"""
+
     @staticmethod
     @logged
-    def md5(string):
+    def md5(string: str) -> str:
         md = hashlib.md5()
         md.update(string.encode(encoding='utf-8'))
         _md5_msg = str(md.hexdigest())
@@ -26,7 +27,7 @@ class Encryption(object):
 
     @staticmethod
     @logged
-    def des(string, secret_key):
+    def des(string: str, secret_key: str) -> str:
         _key = des(secret_key, padmode=PAD_PKCS5)
         _des_str = base64.b64encode(_key.encrypt(json.dumps(string)))
         return _des_str

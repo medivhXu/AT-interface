@@ -1,8 +1,8 @@
 # !/uer/bin/env python3
 
 import os
-import configparser
 
+from configElement.yaml_data import ConfYaml
 from base.super_kit.db_super import DB
 from base.log import LOGGER, logged
 
@@ -21,15 +21,14 @@ class Mysql(DB):
         import pymysql
 
         if not kwargs:
-            db_name = "SERVER"
             try:
-                _conf = configparser.ConfigParser()
-                _conf.read('../__conf.ini')
-                _server_conf = {'host': _conf.get(db_name, "host"),
-                                'user': _conf.get(db_name, "username"),
-                                'passwd': _conf.get(db_name, "password"),
-                                'port': int(_conf.get(db_name, "port")),
-                                'charset': _conf.get(db_name, "charset")}
+                conf = ConfYaml('__conf.yaml').read()
+                _server_conf = {'host': conf['MYSQL']['host'],
+                                'user': conf['MYSQL']['username'],
+                                'passwd': conf['MYSQL']['password'],
+                                'port': conf['MYSQL']['port'],
+                                'charset': conf['MYSQL']['charset'],
+                                'database': conf['MYSQL']['database']}
 
                 self._db = pymysql.connect(**_server_conf)
                 self._cursor = self._db.cursor()
@@ -38,29 +37,27 @@ class Mysql(DB):
                 LOGGER.error(str(ex))
         else:
             try:
-                self._db = pymysql.connect(**kwargs)
+                self._db = pymysql.connect(kwargs)
                 self._cursor = self._db.cursor()
                 LOGGER.info("数据库连接成功!")
             except ConnectionError as ex:
                 LOGGER.error(str(ex))
 
     @logged
-    def select(self, sql):
+    def select(self, sql: str) -> tuple:
         """
 
         :param sql:
         :return: type(tuple)
         """
         try:
-
-            if hasattr(sql, '__iter__'):
-                for sq in sql:
-                    self._cursor.execute(sq)
-            else:
+            if 'select' == sql[:6]:
                 self._cursor.execute(sql)
                 self._db.commit()
                 result = self._cursor.fetchone()
-                yield result
+                return result
+            else:
+                raise ValueError("查询sql不能执行!")
         except Exception as e:
             self._db.rollback()
             LOGGER.error("执行语句出错了。错误信息：{}".format(e))
@@ -69,19 +66,15 @@ class Mysql(DB):
             LOGGER.info("数据库连接关闭!")
 
     @logged
-    def select_all(self, sql):
+    def select_all(self, sql: str) -> tuple:
         try:
-            if iter(sql):
-                for sq in sql:
-                    self._cursor.execute(sq)
-                    self._db.commit()
-                    result = self._cursor.fetchall()
-                    yield result
-            else:
+            if 'select' == sql[:6]:
                 self._cursor.execute(sql)
                 self._db.commit()
                 result = self._cursor.fetchall()
-                yield result
+                return result
+            else:
+                raise ValueError("查询sql不能执行!")
         except Exception as e:
             self._db.rollback()
             LOGGER.error("执行语句出错了。错误信息：{}".format(e))
