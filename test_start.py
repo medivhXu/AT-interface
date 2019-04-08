@@ -11,14 +11,21 @@ from base.my_exception import *
 from base.log import LOGGER
 from analysis.comparison_results import differences
 from module.get_variable import get_var, push_var
+from module.get_msg_from_db import get_msg_from_db
 
 # debug data
 par = [{'case_no': 1, 'case_name': '短信', 'url': 'https://test-acs.czb365.com/services/v3/begin/sendMsg',
         'method': 'post', 'port': None, 'data': {'phone': '$phone'}, 'checkpoint': {'text': {'code': 200}}},
        {'case_no': 1, 'case_name': '登录', 'url': 'https://test-acs.czb365.com/services/v3/begin/loginAppV4',
-        'method': 'post', 'port': None, 'data': {'phone': '$&phone', 'code': '$$get_msg_from_db($&phone)'},
+        'method': 'post', 'port': None, 'data': {'phone': '%phone', 'code': '&get_msg_from_db(%phone)'},
         'checkpoint': {'text': {'code': 200, 'token': '$&token'}}}
        ]
+
+"""
+   $：表示从配置文件中取值
+   %：代表从全局变量中取值
+   &：表示运行系统方法
+"""
 
 TEMPORARY_VARIABLE = {}
 
@@ -27,7 +34,7 @@ TEMPORARY_VARIABLE = {}
 
 
 @parameterized_class(par)
-class Start(unittest.TestCase, TestRunner):
+class Test(unittest.TestCase, TestRunner):
     def setUp(self):
         pass
 
@@ -38,7 +45,7 @@ class Start(unittest.TestCase, TestRunner):
         LOGGER.info('No: {} {}'.format(self.case_no, self.case_name))
         if self.method == 'get':
             # get方法还没调好
-            data = CollageStr(self.data).sign_str(self.data.get('phone'))
+            data = CollageStr(self.data).sign_str(self.data['phone'])
 
             res = requests.get(self.url, data, verify=True)
             LOGGER.info('response: {}'.format(res.text))
@@ -57,30 +64,40 @@ class Start(unittest.TestCase, TestRunner):
         elif self.method == 'post':
             # 取前置条件所需的变量
             for d in self.data:
+                # 变量中有系统方法的
+                if '&' in str(self.data[d]):
+                    func_str = self.data[d].replace('&', '')
+                    func = func_str.split('(')[0]
+                    # 带参方法
+                    if '%' in func_str:
+                        var = func_str.split('%')[-1].replace(')', '')
+                        value = TEMPORARY_VARIABLE[var]
+                        result = eval(func)(value)
+                        if result:
+                            self.data[var] = result
+                        else:
+                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+                    if '$' in func_str:
+                        var = func_str.split('$')[-1].replace(')', '')
+                        print(func_str)
+                        value = get_var(var)
+                        result = eval(func)(value)
+                        if result:
+                            self.data[var] = result
+                        else:
+                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+
+                if '%' in str(self.data[d]):
+                    self.data[d] = TEMPORARY_VARIABLE[d]
+
                 if '$' in str(self.data[d]):
                     k = self.data[d].split('$')[-1].replace(')', '')
                     result = get_var(k)
                     self.data[d] = result
                     TEMPORARY_VARIABLE[d] = result
-                if '$&' in str(self.data[d]):
-                    self.data[d] = TEMPORARY_VARIABLE[d]
-                # 变量中有系统方法的
-                if '$$' in str(self.data[d]):
-                    func_str = self.data[d].replace('$$', '')
-                    func = func_str.split('(')[0]
-                    # 带参方法
-                    if '$&' in func_str:
-                        var = func_str.split('$&')[-1].replace(')', '')
-                        value = TEMPORARY_VARIABLE[var]
-                        result = eval(func)(value)
-                        self.data[var] = result
-                    if '$' in func_str:
-                        var = func_str.split('$')[-1].replace(')', '')
-                        value = get_var(var)
-                        result = eval(func)(value)
-                        self.data[var] = result
 
-            data = CollageStr(self.data).sign_str(self.data.get('phone'))
+            data = CollageStr(self.data).sign_str(self.data['phone'])
+            LOGGER.info('*************************\n全局变量：{}\n******************'.format(TEMPORARY_VARIABLE))
 
             LOGGER.info('***** request: {}')
             start_time = datetime.datetime.now()

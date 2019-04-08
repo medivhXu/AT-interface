@@ -30,3 +30,7 @@ class ConfigurationException(MyException):
 
 class UpdateConfException(MyException):
     pass
+
+
+class RuntimeException(MyException):
+    pass

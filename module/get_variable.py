@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from configElement.yaml_data import ConfYaml
+from base.log import logged, LOGGER
 
 
 def get_var(key, value=None):
@@ -8,7 +9,7 @@ def get_var(key, value=None):
         if value:
             return ConfYaml('user.yaml').read()[value]
         for phone in ConfYaml('user.yaml').read():
-            yield phone
+            return phone
     if key == 'user_id' or key == 'token' or key == 'order_id' or key == 'pay_password':
         if value:
             return ConfYaml('user.yaml').read()[value][key]
@@ -19,6 +20,7 @@ def get_var(key, value=None):
     if key in globals_var:
         return globals_var[key]
 
+    LOGGER.info('key :{}, value: {}'.format(key, value))
     raise KeyError("没找到变量！")
 
 

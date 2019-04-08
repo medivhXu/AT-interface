@@ -38,7 +38,7 @@ class CollageStr(object):
         sort_str = ''
         self._data['app_key'] = self._conf_data[platform][os]['app_key']
         self._data['timestamp'] = str(round(time.time() * 1000))
-        LOGGER.info('######### {}'.format(self._user_data[phone]['token']))
+        LOGGER.info('######### {}'.format(int(phone)))
         self._data['token'] = self._user_data[phone]['token'] or ''
         self._data['app_version'] = self._conf_data[platform][os]['app_version']
         self._data['os'] = self._conf_data[platform][os]['app_key'].split('_')[-1]
