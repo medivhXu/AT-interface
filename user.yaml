@@ -1,7 +1,7 @@
 13800138000:
   order_id: 5555
   pay_password: 123456
-  token: null
+  token:
   user_id: 12345
 17500123456:
   order_id: 3333

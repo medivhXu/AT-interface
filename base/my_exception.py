@@ -34,3 +34,7 @@ class UpdateConfException(MyException):
 
 class RuntimeException(MyException):
     pass
+
+
+class UnknownIdentityException(MyException):
+    pass

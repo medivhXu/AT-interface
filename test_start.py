@@ -74,16 +74,15 @@ class Test(unittest.TestCase, TestRunner):
                         value = TEMPORARY_VARIABLE[var]
                         result = eval(func)(value)
                         if result:
-                            self.data[var] = result
+                            self.data[d] = result
                         else:
                             raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
                     if '$' in func_str:
                         var = func_str.split('$')[-1].replace(')', '')
-                        print(func_str)
                         value = get_var(var)
                         result = eval(func)(value)
                         if result:
-                            self.data[var] = result
+                            self.data[d] = result
                         else:
                             raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
 
@@ -97,9 +96,9 @@ class Test(unittest.TestCase, TestRunner):
                     TEMPORARY_VARIABLE[d] = result
 
             data = CollageStr(self.data).sign_str(self.data['phone'])
-            LOGGER.info('*************************\n全局变量：{}\n******************'.format(TEMPORARY_VARIABLE))
+            LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
 
-            LOGGER.info('***** request: {}')
+            LOGGER.info('***** request: {}'.format(self.data))
             start_time = datetime.datetime.now()
             res = requests.post(self.url, data, verify=True)
             end_time = datetime.datetime.now() - start_time
@@ -114,6 +113,7 @@ class Test(unittest.TestCase, TestRunner):
                             if '$&' in str(self.checkpoint[po][var]):
                                 TEMPORARY_VARIABLE[var] = dict_res['result'][var]
                                 push_var(var, self.data['phone'], dict_res['result'][var])
+                                continue
                             if po == 'text':
                                 self.assertIn(self.checkpoint[po][var], dict_res.values(), '预期不符～')
                             elif po == 'result':
