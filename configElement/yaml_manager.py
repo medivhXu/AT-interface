@@ -13,14 +13,14 @@ class ConfYaml(object):
         self._conf_path = fp
 
     @logged
-    def read(self) -> set:
+    def read(self):
         """
         读取conf文件
         :return: type(dict)
         """
         with open(self._conf_path, 'r', encoding='utf-8') as f:
             text = yaml.load(f, Loader=yaml.Loader)
-        return text
+            return text
 
     @logged
     def update(self, dict_var: dict) -> bool:

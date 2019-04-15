@@ -14,8 +14,8 @@ from base.log import logged
 
 class ReadData(object):
     @logged
-    def __init__(self, file_name="case_data.xlsx", sheet_name="用例", start_row='A7'):
-        self._wb = load_workbook(file_name)
+    def __init__(self, fp, sheet_name="用例", start_row='A8'):
+        self._wb = load_workbook(fp)
         self._sheet = self._wb[sheet_name]
         self._case = []
         self.start_row = start_row
@@ -23,12 +23,12 @@ class ReadData(object):
     @logged
     def get_email_data(self):
         """取excel中配置的email数据"""
-        smtp_server = self._sheet['B4'].value
-        res_user = self._sheet['B5'].value
-        send_user = self._sheet['D4'].value
-        send_pwd = self._sheet['D5'].value
+        smtp_server = self._sheet['G3'].value
+        receiver = self._sheet['G4'].value
+        sender = self._sheet['G5'].value
+        sender_pwd = self._sheet['G6'].value
         self._wb.close()
-        return smtp_server, res_user, send_user, send_pwd
+        return smtp_server, receiver, sender, sender_pwd
 
     @logged
     def get_public_data(self):
@@ -40,20 +40,32 @@ class ReadData(object):
         return app_secret, app_key, version, token
 
     @logged
-    def get_url(self):
-        url = self._sheet['D3'].value
+    def get_host(self):
+        url = self._sheet['B1'].value
         return url
 
     @logged
-    def get_interface_data(self):
+    def get_database_data(self):
+        pass
+
+    @logged
+    def get_cases_data(self):
         """去所有接口，返回接口列表"""
         index_no = int(self.start_row[1]) - 1
         while index_no <= self._sheet.max_row - 1:
-            case_list = [column[index_no].value for column in self._sheet.columns]
-            self._case.append(tuple(case_list[1:]))
+            case_dict = {column[6].value: column[index_no].value for column in self._sheet.columns}
+            self._case.append(case_dict)
             index_no += 1
         self._wb.close()
         return self._case
+
+    @logged
+    def get_global_variable(self):
+        pass
+
+    @logged
+    def get_user_data(self):
+        pass
 
     @logged
     def write_the_result_to_the_new_excel(self, result, differences=None, file_fp=None):
@@ -75,7 +87,7 @@ class ReadData(object):
 
 
 if __name__ == '__main__':
-    run = ReadData()
-    case = run.get_interface_data()
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
+    run = ReadData(os.path.join(path, 'cases.xlsx'))
+    case = run.get_host()
     print(case)
-    # run.write_the_result_to_the_new_excel('True')
