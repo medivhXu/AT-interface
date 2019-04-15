@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from configElement.yaml_data import ConfYaml
+from configElement.yaml_manager import ConfYaml
 from base.log import logged, LOGGER
 
 
+@logged
 def get_var(key, value=None):
     if key == 'phone':
         if value:
@@ -16,7 +17,7 @@ def get_var(key, value=None):
         else:
             raise ValueError("取 {} 必须传手机号！".format(key))
 
-    globals_var = ConfYaml('user_global_variable.yaml').read()
+    globals_var = ConfYaml('global_variable.yaml').read()
     if key in globals_var:
         return globals_var[key]
 
@@ -24,6 +25,7 @@ def get_var(key, value=None):
     raise KeyError("没找到变量！")
 
 
+@logged
 def push_var(var, phone, value=None) -> bool:
     if var == 'phone':
         return ConfYaml('user.yaml').update({phone: None})
@@ -33,8 +35,4 @@ def push_var(var, phone, value=None) -> bool:
         else:
             raise ValueError("取 {} 必须传手机号！".format(var))
 
-    return ConfYaml('user_global_variable.yaml').update({var: phone})
-
-
-if __name__ == '__main__':
-    push_var(var='a',phone='000')
+    return ConfYaml('global_variable.yaml').update({var: phone})
