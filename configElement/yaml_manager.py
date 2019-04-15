@@ -9,8 +9,8 @@ class ConfYaml(object):
     """读写配置文件类"""
 
     @logged
-    def __init__(self, conf_file_name='__conf.yaml'):
-        self._conf_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../{}'.format(conf_file_name))
+    def __init__(self, fp):
+        self._conf_path = fp
 
     @logged
     def read(self) -> set:
@@ -85,9 +85,3 @@ class ConfYaml(object):
         """
         with open(self._conf_path, 'w', encoding='utf-8') as nf:
             yaml.dump(yaml.load(doc), nf, default_flow_style=False)
-
-
-if __name__ == '__main__':
-    run = ConfYaml('user.yaml')
-    run.update({17500123457: {'user_id': 6666}})
-    print(run.read())
