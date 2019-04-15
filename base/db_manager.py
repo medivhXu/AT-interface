@@ -2,7 +2,7 @@
 
 import os
 
-from configElement.yaml_data import ConfYaml
+from configElement.yaml_manager import ConfYaml
 from base.super_kit.db_super import DB
 from base.log import LOGGER, logged
 
@@ -111,10 +111,10 @@ class Oracle(DB):
     def select(self, sql):
         pass
 
-    def update(self, sql):
+    def select_all(self, sql: str):
         pass
 
-    def delete(self, sql):
+    def update(self, sql):
         pass
 
 
