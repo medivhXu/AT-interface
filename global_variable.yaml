@@ -1,6 +1,6 @@
 cityName: "北京"
 device_model: "国行、日版、港行iPhone 7"
-districtName: "\u671D\u9633\u533A"
+districtName:
 latitude: 39.9
 longitude: 116.2
 platformId: 10066001

@@ -1,6 +1,6 @@
-# 变量和系统方法的命名用 python pep标准
+# 变量和系统方法的命名用 python pep标准.
 
-case:
+cases:
   - case_no: 1
     name: "发送短信"
     method: post
@@ -17,7 +17,7 @@ case:
     path: /services/v3/begin/loginAppV42
     data:
       phone: $&phone   # 从请求里取手机号
-      code: $$get_msg_from_db({$&phone})  # 调用系统方法
+      code: $$get_msg_from_db($&phone)  # 调用系统方法
       token:
     check_point:
       text:

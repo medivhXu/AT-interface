@@ -1,18 +1,30 @@
-db:
-  # 数据库配置
+MYSQL:
   host:
   username:
   password:
   port: 3306
-  database: null
-
+  database:
+  charset: utf8mb4
+EMAIL:
+  email_server: smtp.exmail.qq.com
+  receiver:
+  sender:
+  mail_pass:
 APP:
-  # 测试app相关数据
   android:
-    app_version: 3.5.1
-    app_key: app3.0_android
+    app_version:
+    app_key:
     app_secret:
+    host:
+    port:
   ios:
-    app_version: 3.5.1
-    app_key: app3.0_ios
+    app_version:
+    app_key:
     app_secret:
+    host:
+    port:
+  wx:
+    app_key:
+    app_secret:
+    host:
+    port:
