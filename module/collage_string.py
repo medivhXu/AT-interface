@@ -1,17 +1,17 @@
 # !/uer/bin/env python3
 # coding=utf-8
 import time
-from base.log import logged,LOGGER
+from base.log import logged
 from base.encrypt import Encryption
-from configElement.yaml_data import ConfYaml
+from configElement.yaml_manager import ConfYaml
 
 
 class CollageStr(object):
     """核心加密算法，对请求参数进行拼接"""
 
     @logged
-    def __init__(self, data: dict, interface_yaml_filename='interface.yaml', conf_yaml_filename='__conf.yaml',
-                 user_yaml_filename='user.yaml', global_variable_filename='user_global_variable.yaml'):
+    def __init__(self, data: dict, interface_yaml_filename='cases.yaml', conf_yaml_filename='__conf.yaml',
+                 user_yaml_filename='user.yaml', global_variable_filename='global_variable.yaml'):
         """
         加载变量
         :param data:
@@ -38,7 +38,6 @@ class CollageStr(object):
         sort_str = ''
         self._data['app_key'] = self._conf_data[platform][os]['app_key']
         self._data['timestamp'] = str(round(time.time() * 1000))
-        LOGGER.info('######### {}'.format(int(phone)))
         self._data['token'] = self._user_data[phone]['token'] or ''
         self._data['app_version'] = self._conf_data[platform][os]['app_version']
         self._data['os'] = self._conf_data[platform][os]['app_key'].split('_')[-1]
@@ -48,12 +47,6 @@ class CollageStr(object):
         for i in s_list:
             sort_str += ''.__add__(i + str(self._data.get(i)))
         string = app_secret + sort_str + app_secret
-        md = Encryption.md5(string)
-        self._data['sign'] = str(md).lower()
+        md5_str = Encryption.md5(string)
+        self._data['sign'] = str(md5_str).lower()
         return self._data
-
-
-if __name__ == '__main__':
-    a = {'phone': 17500123456}
-    run = CollageStr(a)
-    print(run.sign_str(a.get('phone')))
