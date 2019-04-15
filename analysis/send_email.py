@@ -5,7 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.utils import formataddr
-from configElement.yaml_data import ConfYaml
+from configElement.yaml_manager import ConfYaml
 from base.log import logged, LOGGER
 
 
