@@ -23,14 +23,15 @@ class TestRunner(object):
             os.mkdir(self.cases + '/report')
 
         now = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
-        file_path = "./report/" + now + "result.html"
-        fp = open(file_path, 'wb')
-        tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
-        runner = HTMLTestReportCN.HTMLTestRunner(stream=fp, title=self.title, description=self.des, tester=self.tester)
-        runner.run(tests)
-        fp.close()
+        file_name = now.join(("./report/", "result.html"))
+        with open(file_name, 'wb') as fp:
+            tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
+            runner = HTMLTestReportCN.HTMLTestRunner(stream=fp, title=self.title, description=self.des,
+                                                     tester=self.tester)
+            runner.run(tests)
+
         email_obj = SendEmail()
-        email_obj.send_html_to_email(file_path)
+        email_obj.send_html_to_email(file_name)
 
     def debug(self):
         tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
