@@ -7,7 +7,7 @@
 
 #### run
 ```
-python3 -m unittest -v Test
+venv/bin/python3 -m unittest -v test_start.py
 ```
 
 配置完成后直接运行即可
