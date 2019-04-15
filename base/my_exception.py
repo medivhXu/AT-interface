@@ -38,3 +38,7 @@ class RuntimeException(MyException):
 
 class UnknownIdentityException(MyException):
     pass
+
+
+class UnsupportedFile(MyException):
+    pass
