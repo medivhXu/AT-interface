@@ -1,25 +1,24 @@
 # 变量和系统方法的命名用 python pep标准.
 
-cases:
-  - case_no: 1
-    name: "发送短信"
-    method: post
-    path: /services/v3/begin/sendMsg
-    data:
-      phone: $phone   # 从文件里取值，取变量名必须与key变量名一致
-      token:
-    check_point:
-      text:
-        code: 200
-  - case_no: 2
-    name: "登录"
-    method: post
-    path: /services/v3/begin/loginAppV42
-    data:
-      phone: $&phone   # 从请求里取手机号
-      code: $$get_msg_from_db($&phone)  # 调用系统方法
-      token:
-    check_point:
-      text:
-        code: 200
-        token: $&token
+- case_no: 1
+  case_name: "发送短信"
+  method: post
+  path: https://test-acs.czb365.com/services/v3/begin/sendMsg
+  data:
+    phone: '$phone'   # 从文件里取值，取变量名必须与key变量名一致
+    token:
+  check_point:
+    text:
+      code: 200
+- case_no: 2
+  case_name: "登录"
+  method: post
+  path: https://test-acs.czb365.com/services/v3/begin/loginAppV4
+  data:
+    phone: '%phone'   # 从请求里取手机号
+    code: '&get_msg_from_db(%phone)'  # 调用系统方法
+    token:
+  check_point:
+    text:
+      code: 200
+      token: '$&token'

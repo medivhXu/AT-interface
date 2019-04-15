@@ -1,9 +1,9 @@
 cityName: "北京"
 device_model: "国行、日版、港行iPhone 7"
-districtName:
+districtName: "朝阳区"
 latitude: 39.9
 longitude: 116.2
 platformId: 10066001
-provinceName: "朝阳区"
+provinceName: "北京市"
 seceen_size: 375.0,667.0
 system_version: 12.1.4
