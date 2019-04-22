@@ -14,7 +14,6 @@ from analysis.comparison_results import differences
 from module.get_variable import get_var, push_var
 from module.get_msg_from_db import get_msg_from_db
 
-
 """
              ┏┓   ┏┓
             ┏┛┻━━━┛┻┓
@@ -30,14 +29,8 @@ from module.get_msg_from_db import get_msg_from_db
                ┗┻┛  ┗┻┛
 """
 
-
 # debug data
-# par = [{'case_no': 1, 'case_name': '短信', 'path': 'https://test-acs.czb365.com/services/v3/begin/sendMsg',
-#         'method': 'post', 'port': None, 'data': {'phone': '$phone'}, 'check_point': {'text': {'code': 200}}},
-#        {'case_no': 2, 'case_name': '登录', 'path': 'https://test-acs.czb365.com/services/v3/begin/loginAppV4',
-#         'method': 'post', 'port': None, 'data': {'phone': '%phone', 'code': '&get_msg_from_db(%phone)'},
-#         'check_point': {'text': {'code': 200, 'token': '$&token'}}}
-#        ]
+
 
 """
    $：表示从配置文件中取值
@@ -47,6 +40,7 @@ from module.get_msg_from_db import get_msg_from_db
 """
 
 TEMPORARY_VARIABLE = {}
+
 
 cases = ConfYaml('cases.yaml').read()
 
@@ -63,7 +57,7 @@ class Test(unittest.TestCase, TestRunner):
         LOGGER.info('*************** No: {} {}'.format(self.case_no, self.case_name))
         if self.method == 'get':
             # get方法还没调好
-            data = CollageStr(self.data).sign_str(self.data['phone'])
+            data = CollageStr(self.data).order_str(self.data['phone'])
 
             res = requests.get(self.path, data, verify=True)
             LOGGER.info('response: {}'.format(res.text))
@@ -97,19 +91,21 @@ class Test(unittest.TestCase, TestRunner):
                             raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
                     if '$' in func_str:
                         var = func_str.split('$')[-1].replace(')', '')
-                        value = get_var(var)
+                        value = get_var(var, TEMPORARY_VARIABLE.get('phone'))
                         result = eval(func)(value)
                         if result:
                             self.data[d] = result
                         else:
                             raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
 
+                # 从全局变量中取值
                 if '%' in str(self.data[d]):
                     self.data[d] = TEMPORARY_VARIABLE[d]
 
+                # 从配置文件中取值
                 if '$' in str(self.data[d]):
                     k = self.data[d].split('$')[-1].replace(')', '')
-                    result = get_var(k)
+                    result = get_var(k, TEMPORARY_VARIABLE.get('phone'))
                     self.data[d] = result
                     TEMPORARY_VARIABLE[d] = result
 
@@ -117,7 +113,13 @@ class Test(unittest.TestCase, TestRunner):
                     if not self.data[d]:
                         self.data[d] = ''
 
-            data = CollageStr(self.data).sign_str(self.data['phone'])
+            # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
+            try:
+                phone = TEMPORARY_VARIABLE['phone']
+                data = CollageStr(self.data).order_str(phone)
+            except KeyError:
+                data = CollageStr(self.data).order_str(self.data.get('phone'))
+
             LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
 
             LOGGER.info('***** request: {}'.format(self.data))
