@@ -27,7 +27,7 @@ class CollageStr(object):
         self._global_var = ConfYaml(global_variable_filename).read()
 
     @logged
-    def sign_str(self, phone: int, platform='APP', os='ios') -> dict:
+    def order_str(self, phone: int, platform='APP', os='ios') -> dict:
         """
         加密串拼接
         :param phone: 用户参数化取值
