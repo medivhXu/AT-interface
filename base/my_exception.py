@@ -42,3 +42,7 @@ class UnknownIdentityException(MyException):
 
 class UnsupportedFile(MyException):
     pass
+
+
+class SyntaxException(MyException):
+    pass
