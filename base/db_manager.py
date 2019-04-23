@@ -5,6 +5,13 @@ import os
 from configElement.yaml_manager import ConfYaml
 from base.super_kit.db_super import DB
 from base.log import LOGGER, logged
+from base.my_exception import *
+
+try:
+    import pymysql
+except ImportError:
+    os.system('pip3 install pymysql')
+import pymysql
 
 
 class Mysql(DB):
@@ -14,11 +21,6 @@ class Mysql(DB):
         return cls.instance
 
     def __init__(self, **kwargs):
-        try:
-            import pymysql
-        except ImportError:
-            os.system('pip3 install pymysql')
-        import pymysql
 
         if not kwargs:
             try:
@@ -44,55 +46,87 @@ class Mysql(DB):
                 LOGGER.error(str(ex))
 
     @logged
-    def select(self, sql: str) -> tuple:
-        """
-
-        :param sql:
-        :return: type(tuple)
-        """
-        try:
-            if 'select' == sql[:6]:
-                self._cursor.execute(sql)
-                self._db.commit()
-                result = self._cursor.fetchone()
-                return result
-            else:
-                raise ValueError("查询sql不能执行!")
-        except Exception as e:
-            self._db.rollback()
-            LOGGER.error("执行语句出错了。错误信息：{}".format(e))
-        finally:
-            self._db.close()
-            LOGGER.info("数据库连接关闭!")
+    def select(self, sql):
+        if sql[:6] == 'select':
+            try:
+                with self._db.cursor(cursor=pymysql.cursors.DictCursor) as cursor:
+                    self._db.ping(reconnect=True)
+                    cursor.execute(sql)
+                    LOGGER.info("自增id:{}".format(cursor.lastrowid))
+                    self._db.commit()
+                    result = cursor.fetchone()
+                    return result
+            except Exception as e:
+                self._db.rollback()
+                LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+            finally:
+                self._db.close()
+                LOGGER.info("数据库连接关闭!")
+        else:
+            raise SyntaxException("sql格式错误～")
 
     @logged
-    def select_all(self, sql: str) -> tuple:
-        try:
-            if 'select' == sql[:6]:
-                self._cursor.execute(sql)
-                self._db.commit()
-                result = self._cursor.fetchall()
-                return result
-            else:
-                raise ValueError("查询sql不能执行!")
-        except Exception as e:
-            self._db.rollback()
-            LOGGER.error("执行语句出错了。错误信息：{}".format(e))
-        finally:
-            self._db.close()
-            LOGGER.info("数据库连接关闭!")
+    def select_all(self, sql: str):
+        if sql[:6] == 'select':
+            try:
+                with self._db.cursor(cursor=pymysql.cursors.DictCursor) as cursor:
+                    self._db.ping(reconnect=True)
+                    cursor.execute(sql)
+                    LOGGER.info("自增id:{}".format(cursor.lastrowid))
+                    self._db.commit()
+                    result = cursor.fetchone()
+                    return result
+            except Exception as e:
+                self._db.rollback()
+                LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+            finally:
+                self._db.close()
+                LOGGER.info("数据库连接关闭!")
+        else:
+            raise SyntaxException("sql格式错误～")
 
     @logged
     def insert(self, sql):
-        pass
+        if sql[:6] == 'insert':
+            try:
+                with self._db.cursor(cursor=pymysql.cursors.DictCursor) as cursor:
+                    self._db.ping(reconnect=True)
+                    cursor.execute(sql)
+                    LOGGER.info("自增id:{}".format(cursor.lastrowid))
+                    self._db.commit()
+                    return cursor.lastrowid
+            except Exception as e:
+                self._db.rollback()
+                LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+            finally:
+                self._db.close()
+                LOGGER.info("数据库连接关闭!")
+        else:
+            raise SyntaxException("sql格式错误～")
 
     @logged
     def update(self, sql):
-        pass
+        if sql[:6] == 'update':
+            try:
+                with self._db.cursor(cursor=pymysql.cursors.DictCursor) as cursor:
+                    self._db.ping(reconnect=True)
+                    cursor.execute(sql)
+                    LOGGER.info("自增id:{}".format(cursor.lastrowid))
+                    self._db.commit()
+                    result = cursor.fetchall()
+                    return result
+            except Exception as e:
+                self._db.rollback()
+                LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+            finally:
+                self._db.close()
+                LOGGER.info("数据库连接关闭!")
+        else:
+            raise SyntaxException("sql格式错误～")
 
     @logged
     def delete(self, sql):
-        pass
+        raise NotImplementedError
 
 
 class Oracle(DB):
@@ -106,16 +140,16 @@ class Oracle(DB):
         pass
 
     def insert(self, sql):
-        pass
+        raise NotImplementedError
 
     def select(self, sql):
-        pass
+        raise NotImplementedError
 
     def select_all(self, sql: str):
         pass
 
     def update(self, sql):
-        pass
+        raise NotImplementedError
 
 
 if __name__ == '__main__':
