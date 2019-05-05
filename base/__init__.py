@@ -27,3 +27,8 @@ __version__ = '1.0.3'
 * 修复数据库连接失败异常，增加update、insert方法
 * 增加格式异常类
 """
+
+"""
+1.0.4 version update:
+* 修复数据库update方法返回值问题
+"""

@@ -79,6 +79,7 @@ class Mysql(DB):
             except Exception as e:
                 self._db.rollback()
                 LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+                return False
             finally:
                 self._db.close()
                 LOGGER.info("数据库连接关闭!")
@@ -98,6 +99,7 @@ class Mysql(DB):
             except Exception as e:
                 self._db.rollback()
                 LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+                return False
             finally:
                 self._db.close()
                 LOGGER.info("数据库连接关闭!")
@@ -113,11 +115,11 @@ class Mysql(DB):
                     cursor.execute(sql)
                     LOGGER.info("自增id:{}".format(cursor.lastrowid))
                     self._db.commit()
-                    result = cursor.fetchall()
-                    return result
+                return True
             except Exception as e:
                 self._db.rollback()
                 LOGGER.error("执行语句出错了。错误信息：{}".format(e))
+                return False
             finally:
                 self._db.close()
                 LOGGER.info("数据库连接关闭!")
