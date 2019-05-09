@@ -11,7 +11,7 @@ def get_msg_from_db(phone) -> int:
     result = Mysql().select(sql)
     re_r = re.compile("\d{4}", re.S)
     try:
-        code = re.findall(re_r, result[0])
+        code = re.findall(re_r, result.get('msg'))
         if len(code):
             return code[0]
     except TypeError as e:
