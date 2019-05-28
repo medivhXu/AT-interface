@@ -27,7 +27,7 @@ class CollageStr(object):
         self._global_var = ConfYaml(global_variable_filename).read()
 
     @logged
-    def order_str(self, phone: int, platform='APP', os='ios') -> dict:
+    def order_str(self, phone=None, platform='APP', os='ios') -> dict:
         """
         加密串拼接
         :param phone: 用户参数化取值
@@ -38,10 +38,13 @@ class CollageStr(object):
         sort_str = ''
         self._data['app_key'] = self._conf_data[platform][os]['app_key']
         self._data['timestamp'] = str(round(time.time() * 1000))
-        self._data['token'] = self._user_data[phone]['token'] or ''
-        self._data['app_version'] = self._conf_data[platform][os]['app_version']
+        if phone:
+            self._data['token'] = self._user_data[phone]['token'] or ''
+        if self._conf_data[platform][os]['app_version']:
+            self._data['app_version'] = self._conf_data[platform][os]['app_version']
         self._data['os'] = self._conf_data[platform][os]['app_key'].split('_')[-1]
-        self._data.update(self._global_var)
+        if self._global_var:
+            self._data.update(self._global_var)
         app_secret = self._conf_data[platform][os]['app_secret']
         s_list = sorted(self._data, key=str.lower)
         for i in s_list:

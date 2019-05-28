@@ -29,7 +29,6 @@ from module.get_msg_from_db import get_msg_from_db
                ┗┻┛  ┗┻┛
 """
 
-# debug data
 
 
 """
@@ -55,78 +54,70 @@ class Test(unittest.TestCase, TestRunner):
 
     def test_run(self):
         LOGGER.info('*************** No: {} {}'.format(self.case_no, self.case_name))
-        if self.method == 'get':
-            # get方法还没调好
-            data = CollageStr(self.data).order_str(self.data['phone'])
+        # 取前置条件所需的变量
+        for d in self.data:
+            # 变量中有系统方法的
+            if '&' in str(self.data[d]):
+                func_str = self.data[d].replace('&', '')
+                func = func_str.split('(')[0]
+                # 带参方法
+                if '%' in func_str:
+                    var = func_str.split('%')[-1].replace(')', '')
+                    value = TEMPORARY_VARIABLE[var]
+                    result = eval(func)(value)
+                    if result:
+                        self.data[d] = result
+                    else:
+                        raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+                if '$' in func_str:
+                    var = func_str.split('$')[-1].replace(')', '')
+                    value = get_var(var, TEMPORARY_VARIABLE.get('phone'))
+                    result = eval(func)(value)
+                    if result:
+                        self.data[d] = result
+                    else:
+                        raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
 
-            res = requests.get(self.path, data, verify=True)
-            LOGGER.info('response: {}'.format(res.text))
-            if res.status_code != requests.codes.ok:
-                dict_res = json.dumps(res.text)
-                if self.check_point:
-                    for po in self.check_point.keys():
-                        for var in self.check_point[po].keys():
-                            if po == 'text':
-                                differences(self.check_point[po][var], dict_res)
-                else:
-                    LOGGER.warning("[-]用例: {}, 请求地址: {}, 请求参数: {}, 响应body: {}"
-                                   .format(self.case_no, self.path, res.status_code, res.text))
-            else:
-                LOGGER.info("[+]用例: {}, 请求地址: {}, 参数: {} , 响应: {}".format(self.case_no, self.path, self.data, res.text))
-        elif self.method == 'post':
-            # 取前置条件所需的变量
-            for d in self.data:
-                # 变量中有系统方法的
-                if '&' in str(self.data[d]):
-                    func_str = self.data[d].replace('&', '')
-                    func = func_str.split('(')[0]
-                    # 带参方法
-                    if '%' in func_str:
-                        var = func_str.split('%')[-1].replace(')', '')
-                        value = TEMPORARY_VARIABLE[var]
-                        result = eval(func)(value)
-                        if result:
-                            self.data[d] = result
-                        else:
-                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
-                    if '$' in func_str:
-                        var = func_str.split('$')[-1].replace(')', '')
-                        value = get_var(var, TEMPORARY_VARIABLE.get('phone'))
-                        result = eval(func)(value)
-                        if result:
-                            self.data[d] = result
-                        else:
-                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+            # 从全局变量中取值
+            if '%' in str(self.data[d]):
+                self.data[d] = TEMPORARY_VARIABLE[d]
 
-                # 从全局变量中取值
-                if '%' in str(self.data[d]):
-                    self.data[d] = TEMPORARY_VARIABLE[d]
+            # 从配置文件中取值
+            if '$' in str(self.data[d]):
+                k = self.data[d].split('$')[-1].replace(')', '')
 
-                # 从配置文件中取值
-                if '$' in str(self.data[d]):
-                    k = self.data[d].split('$')[-1].replace(')', '')
-                    result = get_var(k, TEMPORARY_VARIABLE.get('phone'))
-                    self.data[d] = result
-                    TEMPORARY_VARIABLE[d] = result
+                # get('phone') 需要改
+                result = get_var(k, TEMPORARY_VARIABLE.get('phone'))
+                self.data[d] = result
+                TEMPORARY_VARIABLE[d] = result
 
-                if d == 'token':
-                    if not self.data[d]:
-                        self.data[d] = ''
+            if d == 'token':
+                if not self.data[d]:
+                    self.data[d] = ''
 
             # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
-            try:
+            if 'platformCode' in TEMPORARY_VARIABLE.keys():
                 phone = TEMPORARY_VARIABLE['phone']
                 data = CollageStr(self.data).order_str(phone)
-            except KeyError:
-                data = CollageStr(self.data).order_str(self.data.get('phone'))
+            else:
+                # get('phone') 需要改
+                data = CollageStr(self.data).order_str(phone=self.data.get('phone'), os=self.limit.get('os'))
 
             LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
 
             LOGGER.info('***** request: {}'.format(self.data))
-            start_time = datetime.datetime.now()
-            res = requests.post(self.path, data, verify=True)
-            end_time = datetime.datetime.now() - start_time
-            LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
+            if self.method == 'post':
+                start_time = datetime.datetime.now()
+                res = requests.post(self.path, data, headers=self.headers, verify=True)
+                end_time = datetime.datetime.now() - start_time
+                LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
+            elif self.method == 'get':
+                start_time = datetime.datetime.now()
+                res = requests.get(self.path, data, headers=self.headers, verify=True)
+                end_time = datetime.datetime.now() - start_time
+                LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
+            else:
+                raise NotImplementedError("还没实现！")
 
             dict_res = json.loads(res.text)
             if res.status_code == requests.codes.ok:

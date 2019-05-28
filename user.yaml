@@ -2,11 +2,11 @@
   order_id: 5555
   pay_password: 123456
   token:
-  user_id: 12345
+  user_id:
 17500123456:
   order_id: 3333
   pay_password: 123456
-  token: null
+  token:
   user_id: 6666
 17500123457:
   user_id: 6666
