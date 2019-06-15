@@ -1,6 +1,6 @@
 # !/uer/bin/env python3
 # coding=utf-8
-from base.log import logged
+from base.runner import logged
 
 
 @logged
