@@ -2,9 +2,9 @@
 
 import os
 
-from configElement.yaml_manager import ConfYaml
+from configElement import conf_load
 from base.super_kit.db_super import DB
-from base.log import LOGGER, logged
+from base.runner import LOGGER, logged
 from base.my_exception import *
 
 try:
@@ -24,7 +24,7 @@ class Mysql(DB):
 
         if not kwargs:
             try:
-                conf = ConfYaml('__conf.yaml').read()
+                conf = conf_load('__conf.yaml').read()
                 _server_conf = {'host': conf['MYSQL']['host'],
                                 'user': conf['MYSQL']['username'],
                                 'passwd': conf['MYSQL']['password'],
@@ -74,7 +74,7 @@ class Mysql(DB):
                     cursor.execute(sql)
                     LOGGER.info("自增id:{}".format(cursor.lastrowid))
                     self._db.commit()
-                    result = cursor.fetchone()
+                    result = cursor.fetchall()
                     return result
             except Exception as e:
                 self._db.rollback()

@@ -1,18 +1,14 @@
 # !/uer/bin/env python3
-# coding=utf-8
-import os
+
 import yaml
-from base.log import logged
 
 
 class ConfYaml(object):
     """读写配置文件类"""
 
-    @logged
     def __init__(self, fp):
         self._conf_path = fp
 
-    @logged
     def read(self):
         """
         读取conf文件
@@ -22,7 +18,6 @@ class ConfYaml(object):
             text = yaml.load(f, Loader=yaml.Loader)
             return text
 
-    @logged
     def update(self, dict_var: dict) -> bool:
         """
         17500123456:
@@ -53,7 +48,6 @@ class ConfYaml(object):
             yaml.dump(text, nf, default_flow_style=False)
         return True
 
-    @logged
     def _reset(self, doc: dict):
         """
         case:

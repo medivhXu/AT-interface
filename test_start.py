@@ -1,15 +1,14 @@
 # !/uer/bin/env python3
-# coding=utf-8
+
 import unittest
 import requests
 import json
-import datetime
 from parameterized import parameterized_class
+
 from module.collage_string import CollageStr
-from base.runner import TestRunner
+from base.runner import TestRunner, LOGGER
 from base.my_exception import *
-from configElement.yaml_manager import ConfYaml
-from base.log import LOGGER
+from configElement import conf_load
 from analysis.comparison_results import differences
 from module.get_variable import get_var, push_var
 from module.get_msg_from_db import get_msg_from_db
@@ -29,8 +28,6 @@ from module.get_msg_from_db import get_msg_from_db
                ┗┻┛  ┗┻┛
 """
 
-
-
 """
    $：表示从配置文件中取值
    %：代表从全局变量中取值
@@ -40,8 +37,9 @@ from module.get_msg_from_db import get_msg_from_db
 
 TEMPORARY_VARIABLE = {}
 
-
-cases = ConfYaml('cases.yaml').read()
+cases_fp = '../cases.yaml'
+cases = conf_load(cases_fp).read()
+print(cases)
 
 
 @parameterized_class(cases)
@@ -101,21 +99,27 @@ class Test(unittest.TestCase, TestRunner):
                 data = CollageStr(self.data).order_str(phone)
             else:
                 # get('phone') 需要改
-                data = CollageStr(self.data).order_str(phone=self.data.get('phone'), os=self.limit.get('os'))
+                if hasattr(self, 'limit'):
+                    data = CollageStr(self.data).order_str(phone=self.data.get('phone'), os=self.limit.get('os'))
+                else:
+                    data = CollageStr(self.data).order_str(phone=self.data.get('phone'))
 
             LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
 
             LOGGER.info('***** request: {}'.format(self.data))
             if self.method == 'post':
-                start_time = datetime.datetime.now()
-                res = requests.post(self.path, data, headers=self.headers, verify=True)
-                end_time = datetime.datetime.now() - start_time
-                LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
+                if hasattr(self, 'headers'):
+                    res = requests.post(self.path, data, headers=self.headers, verify=True)
+                    t = res.elapsed.total_seconds() * 1000
+                    LOGGER.info('***** response: {}, 响应时间: {:.2f} ms!'.format(res.text, t))
+                else:
+                    res = requests.post(self.path, data, verify=True)
+                    t = res.elapsed.total_seconds() * 1000
+                    LOGGER.info('***** response: {}, 响应时间: {:.2f} ms!'.format(res.text, t))
             elif self.method == 'get':
-                start_time = datetime.datetime.now()
                 res = requests.get(self.path, data, headers=self.headers, verify=True)
-                end_time = datetime.datetime.now() - start_time
-                LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
+                t = res.elapsed.total_seconds() * 1000
+                LOGGER.info('***** response: {}, 响应时间: {:.2f} ms!'.format(res.text, t))
             else:
                 raise NotImplementedError("还没实现！")
 
@@ -139,10 +143,8 @@ class Test(unittest.TestCase, TestRunner):
                                    .format(self.case_no, self.path, res.status_code, res.text))
             else:
                 LOGGER.info("[+]用例: {}, 请求地址: {}, 参数: {} , 响应: {}".format(self.case_no, self.path, self.data, res.text))
-        else:
-            raise MethodException("方法错误，不支持{}方法!".format(self.method))
 
 
 if __name__ == '__main__':
-    run = TestRunner('./', 'xxx接口测试', '测试环境', 'Medivh')
+    run = TestRunner(cases_fp, './', 'xxx接口测试', '测试环境', 'Medivh')
     run.debug()

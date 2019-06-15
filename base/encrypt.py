@@ -5,7 +5,7 @@ import base64
 import os
 import json
 
-from base.log import logged
+from base.runner import logged
 
 try:
     from pyDes import *
