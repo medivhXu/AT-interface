@@ -11,7 +11,7 @@ def conf_load(file_name):
     """
     读取配置文件，如果文件名包含文件后缀，则自动找到最近修改的文件
     :param file_name:
-        示例: 'cases.yaml'
+        示例: 'cases.yaml' or file point
     :return: type(obj)
     """
     if '../' in file_name:

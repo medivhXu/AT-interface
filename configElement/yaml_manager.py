@@ -9,6 +9,10 @@ class ConfYaml(object):
     def __init__(self, fp):
         self._conf_path = fp
 
+    def new(self, data):
+        with open(self._conf_path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f)
+
     def read(self):
         """
         读取conf文件
