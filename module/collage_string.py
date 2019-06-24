@@ -60,21 +60,3 @@ class CollageStr(object):
         md5_str = Encryption.md5(string)
         self._data['sign'] = str(md5_str).lower()
         return self._data
-
-    def test(self):
-        app_secret = '156cd1010214343cd0830330117580bd'
-        self._data['timestamp'] = str(round(time.time() * 1000))
-        s_list = sorted(self._data, key=str.lower)
-        sort_str = ''
-        for i in s_list:
-            sort_str += ''.__add__(i + str(self._data.get(i)))
-        string = sort_str.join((app_secret, app_secret))
-        md5_str = Encryption.md5(string)
-        self._data['sign'] = str(md5_str).lower()
-        return self._data
-
-
-if __name__ == '__main__':
-    a = {'gasIds': 'SD000011427', 'platformType': 92650965, 'phone': 18515966636, 'app_key': 'ectzhushou1.0'}
-    r = CollageStr(a)
-    print(r.test())
