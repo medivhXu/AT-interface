@@ -43,8 +43,8 @@ class CollageStr(object):
         if phone:
             try:
                 self._data['token'] = self._user_data[phone]['token'] or ''
-            except KeyError as e:
-                LOGGER.warn('获取数据时，没有这条数据，报错已自动修正: {}'.format(e))
+            except KeyError:
+                LOGGER.warn('用户文件中没有{}的对应关系，默认设置为空!'.format(phone))
                 self._data['token'] = ''
 
         if self._global_var:
