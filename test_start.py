@@ -80,7 +80,10 @@ class Test(unittest.TestCase, TestRunner):
 
             # 从全局变量中取值
             if '%' in str(self.data[d]):
-                self.data[d] = TEMPORARY_VARIABLE[d]
+                try:
+                    self.data[d] = TEMPORARY_VARIABLE[d]
+                except KeyError:
+                    raise KeyError("全局变量中没有该字段，可能上次请求中没取出来该值！")
 
             # 从配置文件中取值
             if '$' in str(self.data[d]):
@@ -91,16 +94,17 @@ class Test(unittest.TestCase, TestRunner):
                 self.data[d] = result
                 TEMPORARY_VARIABLE[d] = result
 
+            # 如果请求参数中包含token字段，把它置成空字符串
             if d == 'token':
                 if not self.data[d]:
                     self.data[d] = ''
 
+            global request_data
             # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
             if PHONE_WORD in TEMPORARY_VARIABLE.keys():
                 phone = TEMPORARY_VARIABLE[PHONE_WORD]
                 request_data = CollageStr(self.data).order_str(phone)
             else:
-                # get('phone') 需要改
                 if hasattr(self, 'limit'):
                     request_data = CollageStr(self.data).order_str(phone=self.data.get(PHONE_WORD),
                                                                    os=self.limit.get('os'))
@@ -132,9 +136,13 @@ class Test(unittest.TestCase, TestRunner):
                 for po in self.check_point.keys():
                     for var in self.check_point[po].keys():
                         # 取后置参数所需变量, 这里可以扩展一个正则表达式提取器
+                        if isinstance(dict_res, int):
+                            self.assertEqual(self.check_point[po][var], dict_res, '预期不符～')
+                            continue
                         if isinstance(dict_res['result'], list):
                             TEMPORARY_VARIABLE[var] = [po_word for po_word in dict_res['result'] if
                                                        '$&' in self.check_point[po][var]]
+                            continue
                         if '$&' in str(self.check_point[po][var]):
                             # 这有个问题，如果conf.yaml中json层级发生变化，代码会报错
                             TEMPORARY_VARIABLE[var] = dict_res['result'][var]
