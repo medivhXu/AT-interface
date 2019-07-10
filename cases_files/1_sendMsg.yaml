@@ -1,0 +1,15 @@
+- case_no: 1
+  case_name: 短信
+  method: post
+  path: https://xxxx.com/services/v3/begin/sendMsg
+  port:
+  headers: {Content-Type: application/x-www-form-urlencoded}
+  data:
+    phone: $phone
+    platformId: 10066001
+    os: ios
+  limit:
+    os: 苏宁易购（北京）
+  check_point:
+    text:
+      code: 200
