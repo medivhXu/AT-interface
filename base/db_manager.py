@@ -2,12 +2,12 @@
 
 import pymysql
 import contextlib
-from base.runner import LOGGER
-from configElement.yaml_manager import ConfYaml
+from base.loger import LOGGER
+from config_element import conf_load
 
 
 @contextlib.contextmanager
-def mysql():
+def mysql(db_conf=None):
     """
     mysql连接方法
         examples:
@@ -18,7 +18,10 @@ def mysql():
                     print(result)
     :return: 游标
     """
-    conf = ConfYaml('../__conf.yaml').read()['MYSQL']
+    if not db_conf:
+        conf = conf_load('../__conf.yaml').read()['MYSQL']
+    else:
+        conf = db_conf
     conn = pymysql.connect(**conf)
     cur = conn.cursor(cursor=pymysql.cursors.DictCursor)
     try:
