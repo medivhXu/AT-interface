@@ -2,13 +2,17 @@
 # coding=utf-8
 import datetime
 import os
-from base import HTMLTestReportCN
 import unittest
-from analysis.send_email import SendEmail
+
+from base import HTMLTestReportCN
+from base.send_email import smtp_email
+from config_element import ConfYaml
+from base.loger import log_fp
 
 
 class TestRunner(object):
-    def __init__(self, cases="./", title="czb Test Report", description="Test case execution", tester="system"):
+    def __init__(self, cases="./", title="CZB Test Report", description="Test case execution",
+                 tester="system"):
         self.cases = cases
         self.title = title
         self.des = description
@@ -23,15 +27,17 @@ class TestRunner(object):
             os.mkdir(self.cases + '/report')
 
         now = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
-        file_name = now.join(("./report/", "result.html"))
-        with open(file_name, 'wb') as fp:
+        report = os.path.join(os.path.dirname(os.path.abspath(__file__)), now.join(("'../report/'", ".html")))
+        with open(report, 'wb') as fp:
             tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
             runner = HTMLTestReportCN.HTMLTestRunner(stream=fp, title=self.title, description=self.des,
                                                      tester=self.tester)
             runner.run(tests)
 
-        email_obj = SendEmail()
-        email_obj.send_html_to_email(file_name)
+        email_dict = ConfYaml('../__conf.yaml').read()['EMAIL']
+        smtp_email(sender=email_dict['sender'], receivers=email_dict['receivers'], password=email_dict['password'],
+                   smtp_server=email_dict['smtp_server'], port=email_dict['port'],
+                   attachment=[report, log_fp])
 
     def debug(self):
         tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
@@ -39,8 +45,3 @@ class TestRunner(object):
         print("test start:")
         runner.run(tests)
         print("test end!!!")
-
-
-if __name__ == '__main__':
-    test = TestRunner()
-    test.run()

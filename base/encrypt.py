@@ -1,11 +1,9 @@
 # !/uer/bin/env python3
-# coding=utf-8
+
 import hashlib
 import base64
 import os
 import json
-
-from base.log import logged
 
 try:
     from pyDes import *
@@ -18,7 +16,6 @@ class Encryption(object):
     """对参数进行md5加密"""
 
     @staticmethod
-    @logged
     def md5(string: str) -> str:
         """
         md5加密
@@ -31,7 +28,6 @@ class Encryption(object):
         return _md5_msg
 
     @staticmethod
-    @logged
     def des(string: str, secret_key: str) -> str:
         """
         des加密

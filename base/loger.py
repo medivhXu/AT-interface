@@ -1,10 +1,10 @@
-# !/uer/bin/env python3
-# coding=utf-8
-import datetime
-import logging
+#!/usr/bin/env python3
+
 import os
+import logging
 import traceback
 import inspect
+import datetime
 import functools
 
 logs_dir_name = 'logs'
@@ -15,12 +15,12 @@ if logs_dir_name not in os.listdir(os.path.join(__dir__, '../')):
 
 _now = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
 _logs_dir_path = os.path.join(__dir__, ''.join(('../', logs_dir_name, '/')))
-_log_fp = ''.join((_logs_dir_path, _now, ".log"))
+log_fp = ''.join((_logs_dir_path, _now, ".log"))
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename=_log_fp,
+                    filename=log_fp,
                     filemode='w')
 
 _console = logging.StreamHandler()

@@ -1,18 +1,14 @@
 # !/uer/bin/env python3
-# coding=utf-8
+
 import unittest
-import requests
-import json
-import datetime
 from parameterized import parameterized_class
-from module.collage_string import CollageStr
+
+from base.loger import LOGGER
 from base.runner import TestRunner
-from base.my_exception import *
-from configElement.yaml_manager import ConfYaml
-from base.log import LOGGER
-from analysis.comparison_results import differences
-from module.get_variable import get_var, push_var
-from module.get_msg_from_db import get_msg_from_db
+from config_element import conf_load, cases_load
+from base.request_func import request_func
+from module.pretreatment import pretreatment
+from module.post_processing import post_processing
 
 """
              ┏┓   ┏┓
@@ -29,20 +25,11 @@ from module.get_msg_from_db import get_msg_from_db
                ┗┻┛  ┗┻┛
 """
 
-# debug data
-
-
-"""
-   $：表示从配置文件中取值
-   %：代表从全局变量中取值
-   &：表示运行系统方法
-   $&：表示从上一个接口中取数据
-"""
 
 TEMPORARY_VARIABLE = {}
 
-
-cases = ConfYaml('cases.yaml').read()
+cases = cases_load()
+PHONE_WORD = 'phone'
 
 
 @parameterized_class(cases)
@@ -55,101 +42,15 @@ class Test(unittest.TestCase, TestRunner):
 
     def test_run(self):
         LOGGER.info('*************** No: {} {}'.format(self.case_no, self.case_name))
-        if self.method == 'get':
-            # get方法还没调好
-            data = CollageStr(self.data).order_str(self.data['phone'])
+        # 取前置条件所需的变量
 
-            res = requests.get(self.path, data, verify=True)
-            LOGGER.info('response: {}'.format(res.text))
-            if res.status_code != requests.codes.ok:
-                dict_res = json.dumps(res.text)
-                if self.check_point:
-                    for po in self.check_point.keys():
-                        for var in self.check_point[po].keys():
-                            if po == 'text':
-                                differences(self.check_point[po][var], dict_res)
-                else:
-                    LOGGER.warning("[-]用例: {}, 请求地址: {}, 请求参数: {}, 响应body: {}"
-                                   .format(self.case_no, self.path, res.status_code, res.text))
-            else:
-                LOGGER.info("[+]用例: {}, 请求地址: {}, 参数: {} , 响应: {}".format(self.case_no, self.path, self.data, res.text))
-        elif self.method == 'post':
-            # 取前置条件所需的变量
-            for d in self.data:
-                # 变量中有系统方法的
-                if '&' in str(self.data[d]):
-                    func_str = self.data[d].replace('&', '')
-                    func = func_str.split('(')[0]
-                    # 带参方法
-                    if '%' in func_str:
-                        var = func_str.split('%')[-1].replace(')', '')
-                        value = TEMPORARY_VARIABLE[var]
-                        result = eval(func)(value)
-                        if result:
-                            self.data[d] = result
-                        else:
-                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
-                    if '$' in func_str:
-                        var = func_str.split('$')[-1].replace(')', '')
-                        value = get_var(var, TEMPORARY_VARIABLE.get('phone'))
-                        result = eval(func)(value)
-                        if result:
-                            self.data[d] = result
-                        else:
-                            raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+        request_data = pretreatment(unit_test_subclass=self, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE, PHONE_WORD=PHONE_WORD)
 
-                # 从全局变量中取值
-                if '%' in str(self.data[d]):
-                    self.data[d] = TEMPORARY_VARIABLE[d]
+        LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
+        res = request_func(path=self.path, method=self.method, request_data=request_data, headers=self.headers,
+                           verify=True)
 
-                # 从配置文件中取值
-                if '$' in str(self.data[d]):
-                    k = self.data[d].split('$')[-1].replace(')', '')
-                    result = get_var(k, TEMPORARY_VARIABLE.get('phone'))
-                    self.data[d] = result
-                    TEMPORARY_VARIABLE[d] = result
-
-                if d == 'token':
-                    if not self.data[d]:
-                        self.data[d] = ''
-
-            # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
-            try:
-                phone = TEMPORARY_VARIABLE['phone']
-                data = CollageStr(self.data).order_str(phone)
-            except KeyError:
-                data = CollageStr(self.data).order_str(self.data.get('phone'))
-
-            LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
-
-            LOGGER.info('***** request: {}'.format(self.data))
-            start_time = datetime.datetime.now()
-            res = requests.post(self.path, data, verify=True)
-            end_time = datetime.datetime.now() - start_time
-            LOGGER.info('***** response: {}, 响应时间: {} 秒!'.format(res.text, end_time))
-
-            dict_res = json.loads(res.text)
-            if res.status_code == requests.codes.ok:
-                if self.check_point:
-                    for po in self.check_point.keys():
-                        for var in self.check_point[po].keys():
-                            # 取后置参数所需变量
-                            if '$&' in str(self.check_point[po][var]):
-                                TEMPORARY_VARIABLE[var] = dict_res['result'][var]
-                                push_var(var, self.data['phone'], dict_res['result'][var])
-                                continue
-                            if po == 'text':
-                                self.assertIn(self.check_point[po][var], dict_res.values(), '预期不符～')
-                            elif po == 'result':
-                                self.assertIn(self.check_point[po][var], dict_res[po], '预期不符～')
-
-                else:
-                    LOGGER.warning("[-]用例: {}, 请求地址: {}, 请求参数: {}, 响应body: {}"
-                                   .format(self.case_no, self.path, res.status_code, res.text))
-            else:
-                LOGGER.info("[+]用例: {}, 请求地址: {}, 参数: {} , 响应: {}".format(self.case_no, self.path, self.data, res.text))
-        else:
-            raise MethodException("方法错误，不支持{}方法!".format(self.method))
+        post_processing(unit_test_subclass=self, dict_res=res, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE)
 
 
 if __name__ == '__main__':

@@ -1,15 +1,74 @@
 # AT-interface
-基于unittest框架，让工作更快捷方便
+基于flask + unittest框架，让工作更快捷方便，让不懂代码的测试童鞋更容易做接口测试。
 
-#### 安装说明：
+### 安装说明：
 * python3.5+ : http://www.python.org/
-* requests : pip3 install requests
+* requirements : pip3 install -r requirements.txt
+
+### 目标
+#### flask 实现web前端的用例管理
+##### 用户管理
+1. 用户登录-未完成
+2. 用户注册-未完成
+3. 权限管理-未完成
+4. 页面资源管理-未完成
+
+#####用例管理
+1. 用例关键词-增删改查-未完成
+2. 用例关键词-mock-未完成
+
+#####接口管理
+1. 接口-增删改查-未完成
+2. 接口-mock-未完成
+3. 接口参数加载-未完成
+4. 系统方法加载-未完成
+5. mysql数据库-未完成
+6. redis应用-未完成
+7. 抓包工具文件导入
+
+#### 服务端
+##### 基础
+1. 请求方法封装
+2. 日志
+3. 加/解密
+4. 测试报告
+5. 常用异常方法
+6. 发送excel方法
+
+##### 配置文件
+1. yaml配置
+2. excel配置
+3. charles文件
+
+##### 逻辑控制器
+1. if-未完成
+2. loop-未完成
+
+##### 分析
+1. 结果差异-未完成
+2. 断言-未完成
+
+##### 模块（业务编写）
+* 公共
+
+1. 自定义字段拼接
+2. 公共变量获取
+
+* 订单
+1. 设置订单限制等
+
+* 用户
+1. 配置限制用户等
+
+##### 接口数据文件夹 cases_files
+1. 批量读取该文件夹下所有yaml接口数据
+2. config_element中配置文件加载时，可以按照顺序对cases_files中的文件进行排序
 
 #### run
 ```
-venv/bin/python3 -m unittest -v test_start.py
+python3 -m unittest -v test_start.py
 ```
 
-配置完成后直接运行即可
+
 
 未完，待续～

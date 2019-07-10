@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from configElement.yaml_manager import ConfYaml
-from base.log import logged, LOGGER
+from config_element.yaml_manager import ConfYaml
+from base.loger import logged, LOGGER
 
 
 @logged
@@ -18,8 +18,11 @@ def get_var(key, value=None):
             raise ValueError("取 {} 必须传手机号！".format(key))
 
     globals_var = ConfYaml('global_variable.yaml').read()
-    if key in globals_var:
-        return globals_var[key]
+    if globals_var:
+        if key in globals_var:
+            return globals_var[key]
+    else:
+        return
 
     LOGGER.info('key :{}, value: {}'.format(key, value))
     raise KeyError("没找到变量！")

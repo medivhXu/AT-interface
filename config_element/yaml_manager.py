@@ -1,18 +1,19 @@
 # !/uer/bin/env python3
-# coding=utf-8
-import os
+
 import yaml
-from base.log import logged
+# from ruamel import yaml
 
 
 class ConfYaml(object):
     """读写配置文件类"""
 
-    @logged
     def __init__(self, fp):
         self._conf_path = fp
 
-    @logged
+    def new(self, data):
+        with open(self._conf_path, 'w', encoding='utf-8') as f:
+            yaml.dump(data, f)
+
     def read(self):
         """
         读取conf文件
@@ -22,7 +23,6 @@ class ConfYaml(object):
             text = yaml.load(f, Loader=yaml.Loader)
             return text
 
-    @logged
     def update(self, dict_var: dict) -> bool:
         """
         17500123456:
@@ -53,35 +53,19 @@ class ConfYaml(object):
             yaml.dump(text, nf, default_flow_style=False)
         return True
 
-    @logged
-    def _reset(self, doc: dict):
-        """
-        case:
-          1:
-            name: "发送短信"
-            request:
-              checkpoint:
-                text:
-                  code: 200
-              data:
-                phone: $phone
-                token: $token_data
-              path: /services/v3/begin/sendMsg
-            response:
-          2:
-            name: "登录"
-            request:
-              path: /services/v3/begin/loginAppV42
-              data:
-                phone: $phone
-                code: $$get_db_msg($phone)
-                token:
-            response:
-              text:
-                token: $token
+    def add(self, text):
+        new_text = []
+        if isinstance(self.read(), list):
+            new_text.extend(self.read())
+            new_text.extend(text)
+            with open(self._conf_path, 'w', encoding='utf-8') as nf:
+                yaml.dump(new_text, nf, default_flow_style=False)
+        elif not self.read():
+            with open(self._conf_path, 'w', encoding='utf-8') as nf:
+                yaml.dump(text, nf, default_flow_style=False)
+        else:
+            raise NotImplementedError
 
-        host:
-          port: null
-        """
+    def delete(self):
         with open(self._conf_path, 'w', encoding='utf-8') as nf:
-            yaml.dump(yaml.load(doc), nf, default_flow_style=False)
+            yaml.dump(None, nf, default_flow_style=False)
