@@ -1,11 +1,9 @@
 # !/uer/bin/env python3
-# coding=utf-8
+
 import hashlib
 import base64
 import os
 import json
-
-from base.runner import logged
 
 try:
     from pyDes import *
