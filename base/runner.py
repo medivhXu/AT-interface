@@ -11,13 +11,12 @@ from base.loger import log_fp
 
 
 class TestRunner(object):
-    def __init__(self, cases_fp, cases="./", title="CZB Test Report", description="Test case execution",
+    def __init__(self, cases="./", title="CZB Test Report", description="Test case execution",
                  tester="system"):
         self.cases = cases
         self.title = title
         self.des = description
         self.tester = tester
-        self.cases_fp = cases_fp
 
     def run(self):
 
@@ -38,7 +37,7 @@ class TestRunner(object):
         email_dict = ConfYaml('../__conf.yaml').read()['EMAIL']
         smtp_email(sender=email_dict['sender'], receivers=email_dict['receivers'], password=email_dict['password'],
                    smtp_server=email_dict['smtp_server'], port=email_dict['port'],
-                   attachment=[self.cases_fp, report, log_fp])
+                   attachment=[report, log_fp])
 
     def debug(self):
         tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
