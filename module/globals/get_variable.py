@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from configElement.yaml_manager import ConfYaml
-from base.runner import logged, LOGGER
+from config_element.yaml_manager import ConfYaml
+from base.loger import logged, LOGGER
 
 
 @logged

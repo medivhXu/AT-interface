@@ -2,7 +2,7 @@
 # coding=utf-8
 import re
 from base.db_manager import mysql
-from base.runner import logged, LOGGER
+from base.loger import logged, LOGGER
 
 
 @logged

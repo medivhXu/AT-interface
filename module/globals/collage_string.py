@@ -1,25 +1,23 @@
 # !/uer/bin/env python3
 
 import time
-from base.runner import logged, LOGGER
+from base.loger import logged, LOGGER
 from base.encrypt import Encryption
-from configElement import conf_load
+from config_element import conf_load
 
 
 class CollageStr(object):
     """核心加密算法，对请求参数进行拼接"""
 
-    def __init__(self, data: dict, interface_yaml_filename='cases.yaml', conf_yaml_filename='__conf.yaml',
-                 user_yaml_filename='user.yaml', global_variable_filename='global_variable.yaml'):
+    def __init__(self, data: dict, conf_yaml_filename='__conf.yaml', user_yaml_filename='user.yaml',
+                 global_variable_filename='global_variable.yaml'):
         """
         加载变量
         :param data:
-        :param interface_yaml_filename:
         :param conf_yaml_filename:
         :param user_yaml_filename:
         :param global_variable_filename:
         """
-        self._interface_data = conf_load(interface_yaml_filename).read()
         self._data = dict(data)
         self._conf_data = conf_load(conf_yaml_filename).read()
         self._user_data = conf_load(user_yaml_filename).read()
