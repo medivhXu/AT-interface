@@ -1,6 +1,7 @@
 # !/uer/bin/env python3
 
 import yaml
+# from ruamel import yaml
 
 
 class ConfYaml(object):
@@ -52,34 +53,19 @@ class ConfYaml(object):
             yaml.dump(text, nf, default_flow_style=False)
         return True
 
-    def _reset(self, doc: dict):
-        """
-        case:
-          1:
-            name: "发送短信"
-            request:
-              checkpoint:
-                text:
-                  code: 200
-              data:
-                phone: $phone
-                token: $token_data
-              path: /services/v3/begin/sendMsg
-            response:
-          2:
-            name: "登录"
-            request:
-              path: /services/v3/begin/loginAppV42
-              data:
-                phone: $phone
-                code: $$get_db_msg($phone)
-                token:
-            response:
-              text:
-                token: $token
+    def add(self, text):
+        new_text = []
+        if isinstance(self.read(), list):
+            new_text.extend(self.read())
+            new_text.extend(text)
+            with open(self._conf_path, 'w', encoding='utf-8') as nf:
+                yaml.dump(new_text, nf, default_flow_style=False)
+        elif not self.read():
+            with open(self._conf_path, 'w', encoding='utf-8') as nf:
+                yaml.dump(text, nf, default_flow_style=False)
+        else:
+            raise NotImplementedError
 
-        host:
-          port: null
-        """
+    def delete(self):
         with open(self._conf_path, 'w', encoding='utf-8') as nf:
-            yaml.dump(yaml.load(doc), nf, default_flow_style=False)
+            yaml.dump(None, nf, default_flow_style=False)
