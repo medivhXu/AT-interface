@@ -41,18 +41,19 @@ class Test(unittest.TestCase, TestRunner):
         pass
 
     def test_run(self):
-        LOGGER.info('*************** No: {} {}'.format(self.case_no, self.case_name))
-        # 取前置条件所需的变量
+        LOGGER.info('\n*************** No: {} ***************\n'.format(self.case_no))
 
+        # 取前置条件所需的变量
         request_data = pretreatment(unit_test_subclass=self, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE, PHONE_WORD=PHONE_WORD)
 
         LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
-        res = request_func(path=self.path, method=self.method, request_data=request_data, headers=self.headers,
-                           verify=True)
+        res = request_func(path=''.join((self.scheme, '://', self.host, self.path)), method=self.method,
+                           request_data=request_data, headers=self.headers, verify=True)
 
+        # 后置处理，取相关参数
         post_processing(unit_test_subclass=self, dict_res=res, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE)
 
 
 if __name__ == '__main__':
-    run = TestRunner('./', 'xxx接口测试', '测试环境', 'Medivh')
+    run = TestRunner('./', 'Medivh接口测试', '测试环境', 'Medivh')
     run.debug()

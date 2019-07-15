@@ -6,7 +6,7 @@ import unittest
 
 from base import HTMLTestReportCN
 from base.send_email import smtp_email
-from config_element import ConfYaml
+from config_element import conf_load
 from base.loger import log_fp
 
 
@@ -27,14 +27,14 @@ class TestRunner(object):
             os.mkdir(self.cases + '/report')
 
         now = datetime.datetime.now().strftime('%Y-%m-%d_%H_%M_%S')
-        report = os.path.join(os.path.dirname(os.path.abspath(__file__)), now.join(("'../report/'", ".html")))
+        report = os.path.join(os.path.dirname(os.path.abspath(__file__)), now.join(("../report/", ".html")))
         with open(report, 'wb') as fp:
             tests = unittest.defaultTestLoader.discover(self.cases, pattern='test*.py', top_level_dir=None)
             runner = HTMLTestReportCN.HTMLTestRunner(stream=fp, title=self.title, description=self.des,
                                                      tester=self.tester)
             runner.run(tests)
 
-        email_dict = ConfYaml('../__conf.yaml').read()['EMAIL']
+        email_dict = conf_load('../__conf.yaml').read()['EMAIL']
         smtp_email(sender=email_dict['sender'], receivers=email_dict['receivers'], password=email_dict['password'],
                    smtp_server=email_dict['smtp_server'], port=email_dict['port'],
                    attachment=[report, log_fp])

@@ -62,21 +62,20 @@ def pretreatment(unit_test_subclass, TEMPORARY_VARIABLE, PHONE_WORD='phone'):
             TEMPORARY_VARIABLE[d] = result
 
         # 如果请求参数中包含token字段，把它置成空字符串
-        if d == 'token':
-            if not unit_test_subclass.data[d]:
-                unit_test_subclass.data[d] = ''
+        if not unit_test_subclass.data[d] and d == 'token':
+            unit_test_subclass.data[d] = ''
 
-        global request_data
-        # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
-        if PHONE_WORD in TEMPORARY_VARIABLE.keys():
-            phone = TEMPORARY_VARIABLE[PHONE_WORD]
-            request_data = CollageStr(unit_test_subclass.data).order_str(phone)
+    global request_data
+    # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
+    if PHONE_WORD in TEMPORARY_VARIABLE.keys():
+        phone = TEMPORARY_VARIABLE[PHONE_WORD]
+        request_data = CollageStr(unit_test_subclass.data).order_str(phone)
+    else:
+        if hasattr(unit_test_subclass, 'limit'):
+            request_data = CollageStr(unit_test_subclass.data).order_str(
+                phone=unit_test_subclass.data.get(PHONE_WORD),
+                os=unit_test_subclass.data.get('os'))
         else:
-            if hasattr(unit_test_subclass, 'limit'):
-                request_data = CollageStr(unit_test_subclass.data).order_str(
-                    phone=unit_test_subclass.data.get(PHONE_WORD),
-                    os=unit_test_subclass.limit.get('os'))
-            else:
-                request_data = CollageStr(unit_test_subclass.data).order_str(
-                    phone=unit_test_subclass.data.get(PHONE_WORD))
+            request_data = CollageStr(unit_test_subclass.data).order_str(
+                phone=unit_test_subclass.data.get(PHONE_WORD))
     return request_data

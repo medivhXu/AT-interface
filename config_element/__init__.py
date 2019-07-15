@@ -5,6 +5,7 @@ import os
 
 from config_element.yaml_manager import ConfYaml
 from config_element.xlsx_manager import ConfExcel
+from config_element.charles_file_load import CharlesFileLoad
 from base.loger import LOGGER
 
 DP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
@@ -66,21 +67,33 @@ def cases_load(dir_name='cases_files', case_sort=None):
     if ConfYaml(intermediate).read():
         ConfYaml(intermediate).delete()
     if os.path.isdir(dp):
+        order_file_list = []
+        file_list = os.listdir(dp)
+        if '.DS_Store' in file_list:
+            file_list.remove('.DS_Store')
         if case_sort:
-            order_file_list = []
             for i in case_sort:
-                order_file_list.extend([y for y in os.listdir(dp) if i == int(y.split('_')[0])])
+                order_file_list.extend([y for y in file_list if i == int(y.split('_')[0])])
         else:
-            order_file_list = sorted(os.listdir(dp), key=lambda x: int(x.split('_')[0]))
+            order_file_list = sorted(file_list, key=lambda x: int(x.split('_')[0]))
         for file_name in order_file_list:
             fp = os.path.join(dp, file_name)
             if 'yaml' == file_name.split('.')[-1]:
-                conf = ConfYaml(fp).read()
-                yaml = ConfYaml(intermediate)
-                yaml.add(conf)
+                source_data = ConfYaml(fp).read()
+                intermediate_data = ConfYaml(intermediate)
+                intermediate_data.add(source_data)
+            elif 'chlsj' == file_name.split('.')[-1]:
+                # 支持多个chlsj文件，但不能去重
+                source_data = CharlesFileLoad(fp).chlsj_load()
+                intermediate_data = ConfYaml(intermediate)
+                intermediate_data.add(source_data)
             else:
                 LOGGER.warning("{}文件夹下存在其他类型文件，系统直接忽略！".format(dp))
         cases = ConfYaml(intermediate).read()
         return cases
     else:
-        raise NotADirectoryError("参数：{}，不存在该文件夹！")
+        raise NotADirectoryError("{} 不存在该文件夹！",dir_name)
+
+
+if __name__ == '__main__':
+    cases_load()

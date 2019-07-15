@@ -3,7 +3,7 @@
 
 __author__ = 'Medivh Xu'
 
-__version__ = '1.0.3'
+__version__ = '1.0.7'
 
 """
 1.0.0 version update:
@@ -39,4 +39,19 @@ __version__ = '1.0.3'
 * 删除log.py，集成进runner.py中；
 * 优化send_email方法；
 * 
+"""
+
+"""
+1.0.6 version update:
+* 优化数据库调用方法；
+* 还原loger文件；
+* 新增用例批量读取方法；
+* 优化test_start,拆解请求步骤；
+* 新增charles导出chlsj文件支持；
+"""
+
+"""
+1.0.7 version update:
+* 修复bug；
+* 修改chlsj文件支持格式变动；
 """

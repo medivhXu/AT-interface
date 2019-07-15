@@ -31,6 +31,10 @@ class CollageStr(object):
         :param os: 请求平台系统
         :return: type(dict)
         """
+        if 'sign' in self._data:
+            self._data.pop('sign')
+        for k, v in self._data.items():
+            self._data[k] = v or ''
         for k, v in self._conf_data[platform][os].items():
             if k == 'app_secret':
                 continue
@@ -40,10 +44,11 @@ class CollageStr(object):
 
         if phone:
             try:
-                self._data['token'] = self._user_data[phone]['token'] or ''
+                if self._user_data[phone]['token']:
+                    self._data['token'] = self._user_data[phone]['token']
             except KeyError:
                 LOGGER.warn('用户文件中没有{}的对应关系，默认设置为空!'.format(phone))
-                self._data['token'] = ''
+                pass
 
         if self._global_var:
             self._data.update(self._global_var)
