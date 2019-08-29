@@ -7,9 +7,8 @@ from base.loger import LOGGER
 from base.runner import TestRunner
 from config_element import conf_load, cases_load
 from base.request_func import request_func
-from module.pretreatment import pretreatment
-from module.post_processing import post_processing
 
+from module import *
 """
              ┏┓   ┏┓
             ┏┛┻━━━┛┻┓
@@ -28,8 +27,19 @@ from module.post_processing import post_processing
 
 TEMPORARY_VARIABLE = {}
 
+# ===============这里需要根据自己需要修改=============== #
+# 单独加载用例文件
+
+# file = '../3platformAPI.yaml'
+# cases = conf_load(file).read()
+
+# -------------------------------------------------- #
+# 批量加载用例文件，可以按照规定顺序执行
+
 cases = cases_load()
 PHONE_WORD = 'phone'
+
+# =================================================== #
 
 
 @parameterized_class(cases)
@@ -46,12 +56,12 @@ class Test(unittest.TestCase, TestRunner):
         # 取前置条件所需的变量
         request_data = pretreatment(unit_test_subclass=self, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE, PHONE_WORD=PHONE_WORD)
 
-        LOGGER.info('\n*************************\n全局变量：{}\n*************************'.format(TEMPORARY_VARIABLE))
+        LOGGER.info('\n*************全局变量：************\n{}\n*********************************'.format(TEMPORARY_VARIABLE))
         res = request_func(path=''.join((self.scheme, '://', self.host, self.path)), method=self.method,
                            request_data=request_data, headers=self.headers, verify=True)
 
         # 后置处理，取相关参数
-        post_processing(unit_test_subclass=self, dict_res=res, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE)
+        post_processing(unit_test_subclass=self, res=res, TEMPORARY_VARIABLE=TEMPORARY_VARIABLE)
 
 
 if __name__ == '__main__':

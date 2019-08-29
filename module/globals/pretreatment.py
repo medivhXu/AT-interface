@@ -4,6 +4,7 @@ from base.my_exception import *
 from module.globals.collage_string import CollageStr
 from module.globals.get_variable import get_var
 from module.user.get_msg_from_db import get_msg_from_db
+from module.order.random_outer_order_no import get_random_outer_order_id
 
 
 def pretreatment(unit_test_subclass, TEMPORARY_VARIABLE, PHONE_WORD='phone'):
@@ -22,28 +23,42 @@ def pretreatment(unit_test_subclass, TEMPORARY_VARIABLE, PHONE_WORD='phone'):
     :return:
     """
     for d in unit_test_subclass.data:
-        # 调用系统方法
+        # 变量中有系统方法的
         if '&' in str(unit_test_subclass.data[d]):
             func_str = unit_test_subclass.data[d].replace('&', '')
             func = func_str.split('(')[0]
-            # 方法中有参数，参数从全局变量中取值
+            result = []
+            # 带参方法
             if '%' in func_str:
                 var = func_str.split('%')[-1].replace(')', '')
                 value = TEMPORARY_VARIABLE[var]
-                result = eval(func)(value)
-                if result:
-                    unit_test_subclass.data[d] = result
-                else:
-                    raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
-            # 方法中有参数，参数从配置文件中取值
-            if '$' in func_str:
+                try:
+                    if eval(func)(value).__next__():
+                        for i in eval(func)(value):
+                            result.append(i)
+                        # 待优化
+                        unit_test_subclass.data[d] = result[0]
+                except AttributeError:
+                    unit_test_subclass.data[d] = eval(func)(value)
+            # 从配置文件里加载系统方法参数
+            elif '$' in func_str:
                 var = func_str.split('$')[-1].replace(')', '')
                 value = get_var(var, TEMPORARY_VARIABLE.get(PHONE_WORD))
-                result = eval(func)(value)
-                if result:
-                    unit_test_subclass.data[d] = result
-                else:
-                    raise RuntimeException("{}({})方法运行时，未取到结果！".format(func, value))
+                try:
+                    if eval(func)(value).__next__():
+                        for i in eval(func)(value):
+                            result.append(i)
+                        unit_test_subclass.data[d] = result[0]
+                except AttributeError:
+                    unit_test_subclass.data[d] = eval(func)(value)
+            else:
+                try:
+                    if eval(func)().__next__():
+                        for i in eval(func)():
+                            result.append(i)
+                        unit_test_subclass.data[d] = result[0]
+                except AttributeError:
+                    unit_test_subclass.data[d] = eval(func)()
 
         # 从全局变量中取值
         if '%' in str(unit_test_subclass.data[d]):
@@ -69,13 +84,18 @@ def pretreatment(unit_test_subclass, TEMPORARY_VARIABLE, PHONE_WORD='phone'):
     # 如果request data里面写死手机号，这里捕获后，直接传给参数排序
     if PHONE_WORD in TEMPORARY_VARIABLE.keys():
         phone = TEMPORARY_VARIABLE[PHONE_WORD]
-        request_data = CollageStr(unit_test_subclass.data).order_str(phone)
+        try:
+            if unit_test_subclass.limit.get('os'):
+                request_data = CollageStr(unit_test_subclass.data).order_str(phone=phone,
+                                                                             os=unit_test_subclass.limit.get('os'))
+        except AttributeError:
+            request_data = CollageStr(unit_test_subclass.data).order_str(phone=phone)
     else:
-        if hasattr(unit_test_subclass, 'limit'):
+        try:
             request_data = CollageStr(unit_test_subclass.data).order_str(
                 phone=unit_test_subclass.data.get(PHONE_WORD),
-                os=unit_test_subclass.data.get('os'))
-        else:
+                os=unit_test_subclass.limit.get('os'))
+        except AttributeError:
             request_data = CollageStr(unit_test_subclass.data).order_str(
                 phone=unit_test_subclass.data.get(PHONE_WORD))
     return request_data

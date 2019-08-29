@@ -6,35 +6,19 @@ from base.encrypt import Encryption
 from config_element import conf_load
 
 
-class CollageStr(object):
+class CollageStr:
     """核心加密算法，对请求参数进行拼接"""
 
     def __init__(self, data: dict, conf_yaml_filename='__conf.yaml', user_yaml_filename='user.yaml',
                  global_variable_filename='global_variable.yaml'):
-        """
-        加载变量
-        :param data:
-        :param conf_yaml_filename:
-        :param user_yaml_filename:
-        :param global_variable_filename:
-        """
         self._data = dict(data)
         self._conf_data = conf_load(conf_yaml_filename).read()
         self._user_data = conf_load(user_yaml_filename).read()
         self._global_var = conf_load(global_variable_filename).read()
 
     def order_str(self, phone=None, platform='APP', os='ios') -> dict:
-        """
-        加密串拼接
-        :param phone: 用户参数化取值
-        :param platform: 请求平台参数
-        :param os: 请求平台系统
-        :return: type(dict)
-        """
         if 'sign' in self._data:
             self._data.pop('sign')
-        for k, v in self._data.items():
-            self._data[k] = v or ''
         for k, v in self._conf_data[platform][os].items():
             if k == 'app_secret':
                 continue
@@ -42,13 +26,31 @@ class CollageStr(object):
 
         self._data['timestamp'] = str(round(time.time() * 1000))
 
-        if phone:
-            try:
-                if self._user_data[phone]['token']:
-                    self._data['token'] = self._user_data[phone]['token']
-            except KeyError:
-                LOGGER.warn('用户文件中没有{}的对应关系，默认设置为空!'.format(phone))
-                pass
+        if phone and len(str(phone)) == 11:
+            if self._user_data.get(phone):
+                for k, v in self._user_data.get(phone).items():
+                    try:
+                        if k == 'token':
+                            if self._data[k]:
+                                if v:
+                                    self._data[k] = v
+                                    continue
+                        if k == 'payPassword':
+                            if self._data[k]:
+                                if isinstance(self._data[k], int):
+                                    self._data[k] = Encryption.md5(str(self._data[k]))
+                                    continue
+                            elif v:
+                                if isinstance(v, int):
+                                    self._data[k] = Encryption.md5(str(self._user_data[phone][k]))
+                                    continue
+                                else:
+                                    self._data[k] = v
+                            else:
+                                LOGGER.error("支付密码不能为空！")
+                    except KeyError:
+                        LOGGER.warning('用户文件中没有{}的对应关系，默认设置为空!'.format(phone))
+                        pass
 
         if self._global_var:
             self._data.update(self._global_var)

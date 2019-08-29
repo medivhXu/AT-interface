@@ -10,7 +10,7 @@ def request_func(path, request_data, method='post', headers=None, verify=True):
     conf = conf_load('../__conf.yaml').read()['INTERFACE']
     time_out = conf['time_out']
     LOGGER.info('$$$$$ path: {}'.format(path))
-    LOGGER.info('\n****************request******************* \n{}\n***********************************\n'
+    LOGGER.info('\n**************** request ******************* \n{}\n********************************************\n'
                 .format(request_data))
     if method.lower() == 'post':
         if headers:
@@ -25,8 +25,8 @@ def request_func(path, request_data, method='post', headers=None, verify=True):
     else:
         raise NotImplementedError("还没实现！")
     t = res.elapsed.total_seconds() * 1000
-    LOGGER.info('\n*****************response****************** \n{}\n***********************************\n' \
+    LOGGER.info('\n***************** response ****************** \n{}\n*********************************************\n' \
                 '响应时间: {:.2f} ms!'.format(res.text, t))
     if res.status_code != requests.codes.ok:
         LOGGER.warning("[-]请求地址: {}, 参数: {} , 响应: {}".format(path, request_data, res.text))
-    return json.loads(res.text)
+    return res

@@ -3,7 +3,7 @@
 
 __author__ = 'Medivh Xu'
 
-__version__ = '1.0.7'
+__version__ = '1.0.8'
 
 """
 1.0.0 version update:
@@ -54,4 +54,12 @@ __version__ = '1.0.7'
 1.0.7 version update:
 * 修复bug；
 * 修改chlsj文件支持格式变动；
+"""
+
+"""
+1.0.8 version update:
+* 修复bug；
+* 抽出主线中，数据前置处理和后置处理；
+* 新增user类和生成外部orderId类；
+* 优化数据后置处理方法；
 """
