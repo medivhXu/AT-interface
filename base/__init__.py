@@ -3,7 +3,7 @@
 
 __author__ = 'Medivh Xu'
 
-__version__ = '1.0.3'
+__version__ = '1.0.8'
 
 """
 1.0.0 version update:
@@ -43,7 +43,23 @@ __version__ = '1.0.3'
 
 """
 1.0.6 version update:
-* 优化数据库上下文方法；
-* 增加批量读取用例文件夹；
-* 优化start中代码；
+* 优化数据库调用方法；
+* 还原loger文件；
+* 新增用例批量读取方法；
+* 优化test_start,拆解请求步骤；
+* 新增charles导出chlsj文件支持；
+"""
+
+"""
+1.0.7 version update:
+* 修复bug；
+* 修改chlsj文件支持格式变动；
+"""
+
+"""
+1.0.8 version update:
+* 修复bug；
+* 抽出主线中，数据前置处理和后置处理；
+* 新增user类和生成外部orderId类；
+* 优化数据后置处理方法；
 """
