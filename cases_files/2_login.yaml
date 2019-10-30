@@ -1,16 +1,56 @@
 - case_no: 2
-  case_name: 登录
-  method: post
-  path: https://xxxx.com/services/v3/begin/loginAppV4v2
-  port:
-  headers: {Content-Type: application/x-www-form-urlencoded}
-  data:
-    phone: '%phone'
-    os: ios
-    code: '&get_msg_from_db(%phone)'
-  limit:
-    os: 苏宁易购（北京）
   check_point:
-    text:
-      code: 200
-      token: '$&token'
+    code: 200
+    message: OK
+    result:
+#      authenStatus: true
+#      authenType: 1
+#      authenTypeName: "\u7269\u6D41\u8F66/\u5546\u7528\u8F66"
+#      authenTypeStatus: 1
+#      authenTypeStatusName: "\u672A\u8BA4\u8BC1"
+#      energyType: 1
+#      energyTypeStatus: true
+#      newRegister: false
+#      oilHabit: 0
+#      oilName: 92#
+#      oilNo: 92
+#      oilNoStatus: true
+#      scope: 6
+      token: $&token
+#      userId: 123456
+#      uuid:
+  data:
+    app_key:
+    app_version:
+    cityName: "\u5317\u4EAC"
+    code: '&get_msg_from_db(%phone)'
+    device_model: "\u56FD\u884C\u3001\u65E5\u7248\u3001\u6E2F\u884CiPhone 7"
+    districtName: "\u671D\u9633\u533A"
+    latitude: '39.9'
+    longitude: '116.2'
+    os: android
+    phone: '%phone'
+    platformId: '10066001'
+    provinceName: "\u5317\u4EAC"
+    registrationId:
+    seceen_size: 375.0,667.0
+    sign:
+    system_version: 12.3.1
+    timestamp:
+    token: ''
+  headers:
+    Accept: '*/*'
+    Accept-Encoding: gzip;q=1.0, compress;q=0.5
+    Accept-Language: zh-Hans-CN;q=1.0
+    Connection: keep-alive
+    Content-Length: '470'
+    Content-Type: application/x-www-form-urlencoded
+    Cookie:
+    Host: xxxx.xxxx.com
+    User-Agent:
+  host: xxxx.xxxx.com
+  method: POST
+  path: /services/v3/begin/loginAppV4v2
+  scheme: https
+  limit:
+    os: android

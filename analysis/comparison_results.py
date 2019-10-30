@@ -1,6 +1,6 @@
 # !/uer/bin/env python3
 # coding=utf-8
-from base.loger import logged
+from base.logger import logged
 
 
 @logged

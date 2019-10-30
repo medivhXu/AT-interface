@@ -24,20 +24,6 @@ class ConfYaml(object):
             return text
 
     def update(self, dict_var: dict) -> bool:
-        """
-        17500123456:
-          order_id: 3333
-          pay_password: 123456
-          token: null
-          user_id: 12345
-        13800138000:
-          order_id: 5555
-          pay_password: 123456
-          token: null
-          user_id: 12345
-        :param dict_var: type(dict)
-        :return:
-        """
         text = self.read()
         for d1 in dict_var:
             if isinstance(dict_var[d1], dict):

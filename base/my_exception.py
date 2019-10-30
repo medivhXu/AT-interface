@@ -45,3 +45,11 @@ class UnsupportedFile(MyException):
 
 class SyntaxException(MyException):
     pass
+
+
+class MatchException(MyException):
+    pass
+
+
+class Parameter(MyException):
+    pass

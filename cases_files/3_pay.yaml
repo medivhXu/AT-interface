@@ -1,0 +1,24 @@
+- case_no: 4
+  case_name: 支付
+  host: xxxx.xxxx.com
+  method: POST
+  path: /services/v3/pay/placeTheOrder
+  scheme: https
+  port:
+  headers: {Content-Type: application/x-www-form-urlencoded}
+  data:
+    token: '%token'
+    phone: '%phone'
+    os: Redmi 4
+    gasId: ZS00444110011468
+    gunNo: 1
+    amountGun: 100
+    couponId: 0
+    payType: 10
+    payPassword: 333333
+    isBalance: 1
+    cityCode: 010
+  limit:
+    os: android
+  check_point:
+    code: 200

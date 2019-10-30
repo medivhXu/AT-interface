@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from config_element.yaml_manager import ConfYaml
-from base.loger import logged, LOGGER
+from base.logger import logged, LOGGER
 
 
 @logged
@@ -10,7 +10,7 @@ def get_var(key, value=None):
         if value:
             return ConfYaml('user.yaml').read()[value]
         for phone in ConfYaml('user.yaml').read():
-            return phone
+            yield phone
     if key == 'user_id' or key == 'token' or key == 'order_id' or key == 'pay_password':
         if value:
             return ConfYaml('user.yaml').read()[value][key]
