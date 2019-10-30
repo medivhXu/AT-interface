@@ -6,7 +6,7 @@ import os
 from config_element.yaml_manager import ConfYaml
 from config_element.xlsx_manager import ConfExcel
 from config_element.charles_file_load import CharlesFileLoad
-from base.loger import LOGGER
+from base.logger import LOGGER
 
 DP = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../')
 

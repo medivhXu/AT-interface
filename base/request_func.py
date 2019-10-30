@@ -2,7 +2,7 @@
 
 import json
 import requests
-from base.loger import LOGGER
+from base.logger import LOGGER
 from config_element import conf_load
 
 

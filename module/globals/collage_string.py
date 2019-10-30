@@ -1,7 +1,9 @@
 # !/uer/bin/env python3
 
 import time
-from base.loger import logged, LOGGER
+from collections import defaultdict
+
+from base.logger import logged, LOGGER
 from base.encrypt import Encryption
 from config_element import conf_load
 
@@ -57,7 +59,7 @@ class CollageStr:
 
         app_secret = self._conf_data[platform][os]['app_secret']
 
-        s_list = sorted(self._data, key=str.lower)
+        s_list = sorted(self._data)
         sort_str = ''
         for i in s_list:
             sort_str += ''.__add__(i + str(self._data.get(i)))

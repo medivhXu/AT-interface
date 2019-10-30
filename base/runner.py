@@ -7,7 +7,7 @@ import unittest
 from base import HTMLTestReportCN
 from base.send_email import smtp_email
 from config_element import conf_load
-from base.loger import log_fp
+from base.logger import log_fp
 
 
 class TestRunner(object):

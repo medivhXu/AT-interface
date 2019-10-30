@@ -3,7 +3,7 @@
 import unittest
 from parameterized import parameterized_class
 
-from base.loger import LOGGER
+from base.logger import LOGGER
 from base.runner import TestRunner
 from config_element import conf_load, cases_load
 from base.request_func import request_func
