@@ -9,7 +9,7 @@ parameterized==0.7.0
 pbr==5.1.1
 pyDes==2.0.1
 PyMySQL==0.9.3
-PyYAML==5.1.1
+PyYAML==5.4
 requests==2.22.0
 ruamel.yaml==0.15.98
 selenium==3.141.0
